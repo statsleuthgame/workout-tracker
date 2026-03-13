@@ -4,8 +4,8 @@
   "description": "Your personal workout tracker with progressive overload",
   "start_url": "/today",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#0f172a",
+  "background_color": "#f0fdf4",
+  "theme_color": "#166534",
   "orientation": "portrait",
   "icons": [
     {

@@ -12,7 +12,7 @@ export function FormCueTip({ cues }: FormCueTipProps) {
       {cues.map((cue, i) => (
         <span
           key={i}
-          className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700"
+          className="rounded-full bg-success-muted px-2.5 py-0.5 text-xs font-medium text-success"
         >
           {cue}
         </span>

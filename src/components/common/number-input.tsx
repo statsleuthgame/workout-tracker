@@ -26,7 +26,7 @@ export function NumberInput({
       <button
         type="button"
         onClick={() => onChange(Math.max(min, (value || 0) - step))}
-        className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted text-lg font-bold text-muted-foreground active:bg-muted/80 transition-colors"
+        className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted text-lg font-bold text-muted-foreground transition-colors active:bg-muted/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         aria-label="Decrease"
       >
         -
@@ -42,12 +42,12 @@ export function NumberInput({
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         placeholder={placeholder}
-        className="h-10 w-16 rounded-lg border border-border bg-background text-center text-base font-semibold outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+        className="h-12 w-20 rounded-xl border border-border bg-background text-center text-lg font-semibold outline-none placeholder:text-muted-foreground/60 focus:border-primary focus:ring-1 focus:ring-primary"
       />
       <button
         type="button"
         onClick={() => onChange((value || 0) + step)}
-        className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted text-lg font-bold text-muted-foreground active:bg-muted/80 transition-colors"
+        className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted text-lg font-bold text-muted-foreground transition-colors active:bg-muted/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         aria-label="Increase"
       >
         +

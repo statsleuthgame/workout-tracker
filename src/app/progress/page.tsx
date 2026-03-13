@@ -5,6 +5,9 @@ import { Card } from "@/components/ui/card";
 import { useWorkoutLogs, useBodyMetrics } from "@/lib/db/hooks";
 import { db } from "@/lib/db/database";
 import { formatDate } from "@/lib/utils/dates";
+import { PageHeader } from "@/components/common/page-header";
+import { StatCard } from "@/components/common/stat-card";
+import { CHART_COLORS } from "@/lib/constants/chart-colors";
 import {
   LineChart,
   Line,
@@ -59,7 +62,6 @@ export default function ProgressPage() {
       (s) => s.completed && s.actualWeight
     );
 
-    // Group by exercise
     const byExercise = new Map<string, { weight: number; date: string }[]>();
     const allLogs = await db.workoutLogs.toArray();
     const logDateMap = new Map<string, string>();
@@ -72,12 +74,10 @@ export default function ProgressPage() {
       byExercise.set(set.exerciseId, existing);
     });
 
-    // Get exercise names
     const exercises = await db.exercises.toArray();
     const nameMap = new Map<string, string>();
     exercises.forEach((e) => nameMap.set(e.id, e.name));
 
-    // Return top 5 exercises by data points
     return Array.from(byExercise.entries())
       .sort(([, a], [, b]) => b.length - a.length)
       .slice(0, 5)
@@ -98,42 +98,33 @@ export default function ProgressPage() {
       weight: m.weight,
     })) || [];
 
+  const streak = calculateStreak(completedWorkouts.map((w) => w.date));
+
   return (
     <div className="space-y-4 px-4 pt-6">
-      <div>
-        <h1 className="text-2xl font-bold">Progress</h1>
-        <p className="text-sm text-muted-foreground">
-          Track your gains over time
-        </p>
-      </div>
+      <PageHeader title="Progress" subtitle="Track your gains over time" />
 
       {/* Stats Summary */}
       <div className="flex gap-3">
-        <Card className="flex-1 px-3 py-2 text-center">
-          <p className="text-xs font-medium text-muted-foreground">Workouts</p>
-          <p className="text-2xl font-bold">{completedWorkouts.length}</p>
-        </Card>
-        <Card className="flex-1 px-3 py-2 text-center">
-          <p className="text-xs font-medium text-muted-foreground">
-            This Week
-          </p>
-          <p className="text-2xl font-bold">
-            {
-              completedWorkouts.filter((w) => {
-                const d = new Date(w.date);
-                const now = new Date();
-                const diff = now.getTime() - d.getTime();
-                return diff < 7 * 24 * 60 * 60 * 1000;
-              }).length
-            }
-          </p>
-        </Card>
-        <Card className="flex-1 px-3 py-2 text-center">
-          <p className="text-xs font-medium text-muted-foreground">Streak</p>
-          <p className="text-2xl font-bold">
-            {calculateStreak(completedWorkouts.map((w) => w.date))}
-          </p>
-        </Card>
+        <StatCard label="Workouts" value={completedWorkouts.length} />
+        <StatCard
+          label="This Week"
+          value={
+            completedWorkouts.filter((w) => {
+              const d = new Date(w.date);
+              const now = new Date();
+              const diff = now.getTime() - d.getTime();
+              return diff < 7 * 24 * 60 * 60 * 1000;
+            }).length
+          }
+        />
+        <StatCard label="Streak" value={streak}>
+          {streak >= 3 && (
+            <span className="text-lg" role="img" aria-label="fire">
+              🔥
+            </span>
+          )}
+        </StatCard>
       </div>
 
       {/* Body Weight Trend */}
@@ -142,7 +133,7 @@ export default function ProgressPage() {
           <h2 className="mb-3 text-sm font-semibold">Body Weight</h2>
           <ResponsiveContainer width="100%" height={180}>
             <LineChart data={weightData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />
               <XAxis dataKey="date" tick={{ fontSize: 10 }} tickLine={false} />
               <YAxis
                 domain={["dataMin - 2", "dataMax + 2"]}
@@ -154,9 +145,9 @@ export default function ProgressPage() {
               <Line
                 type="monotone"
                 dataKey="weight"
-                stroke="#10b981"
+                stroke={CHART_COLORS.success}
                 strokeWidth={2}
-                dot={{ fill: "#10b981", r: 3 }}
+                dot={{ fill: CHART_COLORS.success, r: 3 }}
               />
             </LineChart>
           </ResponsiveContainer>
@@ -169,11 +160,11 @@ export default function ProgressPage() {
           <h2 className="mb-3 text-sm font-semibold">Weekly Volume (Sets)</h2>
           <ResponsiveContainer width="100%" height={180}>
             <BarChart data={weeklyVolume}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />
               <XAxis dataKey="week" tick={{ fontSize: 10 }} tickLine={false} />
               <YAxis tick={{ fontSize: 10 }} tickLine={false} width={30} />
               <Tooltip />
-              <Bar dataKey="sets" fill="#6366f1" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="sets" fill={CHART_COLORS.info} radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </Card>
@@ -186,7 +177,7 @@ export default function ProgressPage() {
             <h2 className="mb-3 text-sm font-semibold">{ex.name}</h2>
             <ResponsiveContainer width="100%" height={150}>
               <LineChart data={ex.data}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />
                 <XAxis
                   dataKey="date"
                   tick={{ fontSize: 10 }}
@@ -202,9 +193,9 @@ export default function ProgressPage() {
                 <Line
                   type="monotone"
                   dataKey="weight"
-                  stroke="#f59e0b"
+                  stroke={CHART_COLORS.warning}
                   strokeWidth={2}
-                  dot={{ fill: "#f59e0b", r: 3 }}
+                  dot={{ fill: CHART_COLORS.warning, r: 3 }}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -214,9 +205,9 @@ export default function ProgressPage() {
       {/* Empty State */}
       {completedWorkouts.length === 0 && (
         <Card className="px-4 py-8 text-center">
-          <p className="text-lg font-semibold">No workouts yet</p>
+          <p className="text-lg font-semibold">The best graphs start somewhere</p>
           <p className="text-sm text-muted-foreground">
-            Complete your first workout to see progress here!
+            Complete a workout and watch the data roll in.
           </p>
         </Card>
       )}

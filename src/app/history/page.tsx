@@ -6,6 +6,7 @@ import { useWorkoutLogs } from "@/lib/db/hooks";
 import { db } from "@/lib/db/database";
 import { formatDate } from "@/lib/utils/dates";
 import { useLiveQuery } from "dexie-react-hooks";
+import { PageHeader } from "@/components/common/page-header";
 
 export default function HistoryPage() {
   const workoutLogs = useWorkoutLogs();
@@ -22,10 +23,15 @@ export default function HistoryPage() {
     }));
   }, [workoutLogs]);
 
-  // Get set counts per workout log
+  // Get set counts per workout log — use indexed query instead of full table scan
   const setCounts = useLiveQuery(async () => {
-    if (!workoutLogs) return new Map<string, { completed: number; total: number }>();
-    const allSets = await db.setLogs.toArray();
+    if (!workoutLogs || workoutLogs.length === 0)
+      return new Map<string, { completed: number; total: number }>();
+    const logIds = workoutLogs.map((l) => l.id);
+    const allSets = await db.setLogs
+      .where("workoutLogId")
+      .anyOf(logIds)
+      .toArray();
     const counts = new Map<string, { completed: number; total: number }>();
 
     for (const log of workoutLogs) {
@@ -40,12 +46,10 @@ export default function HistoryPage() {
 
   return (
     <div className="space-y-4 px-4 pt-6">
-      <div>
-        <h1 className="text-2xl font-bold">Workout History</h1>
-        <p className="text-sm text-muted-foreground">
-          Every workout you&apos;ve completed
-        </p>
-      </div>
+      <PageHeader
+        title="Workout History"
+        subtitle="Every workout you've completed"
+      />
 
       {enrichedLogs && enrichedLogs.length > 0 ? (
         <div className="space-y-2">
@@ -62,7 +66,7 @@ export default function HistoryPage() {
                         {log.template?.dayLabel || "Workout"}
                       </h3>
                       {isCompleted ? (
-                        <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 text-[10px]">
+                        <Badge className="bg-success-muted text-success hover:bg-success-muted text-[10px]">
                           Complete
                         </Badge>
                       ) : (
@@ -95,9 +99,9 @@ export default function HistoryPage() {
         </div>
       ) : (
         <Card className="px-4 py-8 text-center">
-          <p className="text-lg font-semibold">No history yet</p>
+          <p className="text-lg font-semibold">Your story starts today</p>
           <p className="text-sm text-muted-foreground">
-            Start a workout and it will show up here!
+            Every rep, every set, every workout — it all adds up.
           </p>
         </Card>
       )}

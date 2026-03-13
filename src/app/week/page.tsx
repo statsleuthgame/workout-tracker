@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import {
   useTemplatesForWeek,
   useProgram,
@@ -13,6 +12,8 @@ import {
   getDayAbbrev,
   getDateForDayInWeek,
 } from "@/lib/utils/dates";
+import { PageHeader } from "@/components/common/page-header";
+import { Check, ChevronRight } from "lucide-react";
 import Link from "next/link";
 
 export default function WeekPage() {
@@ -22,7 +23,22 @@ export default function WeekPage() {
   const templates = useTemplatesForWeek(selectedWeek);
   const completedWorkouts = useCompletedWorkoutsForWeek(selectedWeek);
 
-  if (!program) return null;
+  if (!program) {
+    return (
+      <div className="space-y-4 px-4 pt-6">
+        <div className="h-9 w-48 animate-pulse rounded-xl bg-muted" />
+        <div className="h-5 w-32 animate-pulse rounded bg-muted" />
+        <div className="flex gap-2">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="h-11 flex-1 animate-pulse rounded-xl bg-muted" />
+          ))}
+        </div>
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="h-16 animate-pulse rounded-xl bg-muted" />
+        ))}
+      </div>
+    );
+  }
 
   const completedTemplateIds = new Set(
     completedWorkouts?.map((w) => w.templateId) || []
@@ -30,10 +46,7 @@ export default function WeekPage() {
 
   return (
     <div className="space-y-4 px-4 pt-6">
-      <div>
-        <h1 className="text-2xl font-bold">{program.name}</h1>
-        <p className="text-sm text-muted-foreground">{program.phase}</p>
-      </div>
+      <PageHeader title={program.name} subtitle={program.phase} />
 
       {/* Week Tabs */}
       <div className="flex gap-2">
@@ -41,7 +54,7 @@ export default function WeekPage() {
           <button
             key={week}
             onClick={() => setSelectedWeek(week)}
-            className={`flex-1 rounded-lg py-2 text-sm font-semibold transition-colors ${
+            className={`flex-1 rounded-xl py-3 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
               selectedWeek === week
                 ? "bg-primary text-primary-foreground"
                 : "bg-muted text-muted-foreground hover:bg-muted/80"
@@ -69,7 +82,7 @@ export default function WeekPage() {
               <Card
                 className={`flex items-center gap-4 px-4 py-3 transition-colors hover:bg-muted/50 ${
                   isToday ? "border-primary" : ""
-                } ${isCompleted ? "bg-emerald-50/50" : ""}`}
+                } ${isCompleted ? "bg-success-muted/50" : ""}`}
               >
                 <div
                   className={`flex h-12 w-12 flex-col items-center justify-center rounded-xl ${
@@ -98,36 +111,12 @@ export default function WeekPage() {
                 </div>
 
                 {isCompleted && (
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                      className="h-5 w-5 text-emerald-600"
-                      aria-hidden="true"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-success-muted">
+                    <Check className="h-5 w-5 text-success" aria-hidden="true" />
                   </div>
                 )}
 
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  className="h-4 w-4 text-muted-foreground"
-                  aria-hidden="true"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
-                    clipRule="evenodd"
-                  />
-                </svg>
+                <ChevronRight className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
               </Card>
             </Link>
           );

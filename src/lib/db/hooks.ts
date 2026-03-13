@@ -63,10 +63,12 @@ export function useCompletedWorkoutsForWeek(weekNumber: number) {
       .toArray();
 
     const templateIds = templates.map((t) => t.id);
-    const logs = await db.workoutLogs.toArray();
+    const logs = await db.workoutLogs
+      .where("templateId")
+      .anyOf(templateIds)
+      .filter((log) => !!log.completedAt)
+      .toArray();
 
-    return logs.filter(
-      (log) => templateIds.includes(log.templateId) && log.completedAt
-    );
+    return logs;
   }, [weekNumber]);
 }

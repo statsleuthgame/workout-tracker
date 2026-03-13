@@ -5,6 +5,9 @@ import { Card } from "@/components/ui/card";
 import { useBodyMetrics } from "@/lib/db/hooks";
 import { db } from "@/lib/db/database";
 import { getDateString, formatDate } from "@/lib/utils/dates";
+import { PageHeader } from "@/components/common/page-header";
+import { StatCard } from "@/components/common/stat-card";
+import { CHART_COLORS } from "@/lib/constants/chart-colors";
 import {
   LineChart,
   Line,
@@ -51,40 +54,28 @@ export default function WeightLogPage() {
 
   return (
     <div className="space-y-4 px-4 pt-6">
-      <div>
-        <h1 className="text-2xl font-bold">Weight Log</h1>
-        <p className="text-sm text-muted-foreground">
-          Track your weight loss progress
-        </p>
-      </div>
+      <PageHeader title="Weight Log" subtitle="Track your weight loss progress" />
 
       {/* Summary Cards */}
       {metrics && metrics.length > 0 && (
         <div className="flex gap-3">
-          <Card className="flex-1 px-3 py-2 text-center">
-            <p className="text-xs font-medium text-muted-foreground">Current</p>
-            <p className="text-lg font-bold">{latestWeight} lbs</p>
-          </Card>
-          <Card className="flex-1 px-3 py-2 text-center">
-            <p className="text-xs font-medium text-muted-foreground">Change</p>
-            <p
-              className={`text-lg font-bold ${
-                weightChange && weightChange < 0
-                  ? "text-emerald-600"
-                  : weightChange && weightChange > 0
-                  ? "text-red-500"
-                  : ""
-              }`}
-            >
-              {weightChange !== null
+          <StatCard label="Current" value={`${latestWeight} lbs`} />
+          <StatCard
+            label="Change"
+            value={
+              weightChange !== null
                 ? `${weightChange > 0 ? "+" : ""}${weightChange.toFixed(1)} lbs`
-                : "-"}
-            </p>
-          </Card>
-          <Card className="flex-1 px-3 py-2 text-center">
-            <p className="text-xs font-medium text-muted-foreground">Entries</p>
-            <p className="text-lg font-bold">{metrics.length}</p>
-          </Card>
+                : "-"
+            }
+            className={
+              weightChange && weightChange < 0
+                ? "text-success"
+                : weightChange && weightChange > 0
+                ? "text-destructive"
+                : ""
+            }
+          />
+          <StatCard label="Entries" value={metrics.length} />
         </div>
       )}
 
@@ -94,7 +85,7 @@ export default function WeightLogPage() {
           <h2 className="mb-3 text-sm font-semibold">Weight Trend</h2>
           <ResponsiveContainer width="100%" height={200}>
             <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />
               <XAxis
                 dataKey="date"
                 tick={{ fontSize: 10 }}
@@ -110,9 +101,9 @@ export default function WeightLogPage() {
               <Line
                 type="monotone"
                 dataKey="weight"
-                stroke="#10b981"
+                stroke={CHART_COLORS.success}
                 strokeWidth={2}
-                dot={{ fill: "#10b981", r: 4 }}
+                dot={{ fill: CHART_COLORS.success, r: 4 }}
                 activeDot={{ r: 6 }}
               />
             </LineChart>
@@ -130,12 +121,12 @@ export default function WeightLogPage() {
             value={weight}
             onChange={(e) => setWeight(e.target.value)}
             placeholder="Weight (lbs)"
-            className="flex-1 rounded-xl border border-border bg-background px-3 py-2.5 text-base outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+            className="flex-1 rounded-xl border border-border bg-background px-3 py-2.5 text-base outline-none placeholder:text-muted-foreground/60 focus:border-primary focus:ring-1 focus:ring-primary"
           />
           <button
             onClick={handleLog}
             disabled={!weight}
-            className="rounded-xl bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground transition-colors disabled:opacity-50 active:bg-primary/90"
+            className="rounded-xl bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 active:bg-primary/90"
           >
             Log
           </button>
@@ -145,7 +136,7 @@ export default function WeightLogPage() {
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           placeholder="Notes (optional)"
-          className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+          className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm outline-none placeholder:text-muted-foreground/60 focus:border-primary focus:ring-1 focus:ring-primary"
         />
       </Card>
 

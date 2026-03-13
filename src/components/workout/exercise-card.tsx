@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { FormCueTip } from "./form-cue-tip";
@@ -11,6 +11,7 @@ import {
   calculateProgression,
   type ProgressionSuggestion,
 } from "@/lib/progression/engine";
+import { CheckCircle2, ChevronDown } from "lucide-react";
 
 interface ExerciseCardProps {
   exerciseId: string;
@@ -38,6 +39,8 @@ export function ExerciseCard({
   const [suggestion, setSuggestion] = useState<ProgressionSuggestion | null>(
     null
   );
+  const [popping, setPopping] = useState(false);
+  const popTimeout = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => {
     calculateProgression(exerciseId, targetReps).then(setSuggestion);
@@ -73,6 +76,14 @@ export function ExerciseCard({
         completedAt: newCompleted ? new Date().toISOString() : undefined,
       });
     }
+
+    // Haptic + pop animation on completion
+    if (newCompleted) {
+      navigator.vibrate?.(50);
+      setPopping(true);
+      clearTimeout(popTimeout.current);
+      popTimeout.current = setTimeout(() => setPopping(false), 300);
+    }
   }, [setId, completed, workoutLogId, exerciseId, targetReps]);
 
   const handleWeightChange = useCallback(
@@ -96,20 +107,39 @@ export function ExerciseCard({
     [setId, workoutLogId, exerciseId, targetReps]
   );
 
-  if (!exercise) return null;
+  if (!exercise) {
+    return (
+      <Card className="overflow-hidden">
+        <div className="flex items-center gap-3 px-4 py-3">
+          <div className="h-5 w-32 animate-pulse rounded bg-muted" />
+          <div className="h-4 w-20 animate-pulse rounded bg-muted" />
+        </div>
+      </Card>
+    );
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      setExpanded(!expanded);
+    }
+  };
 
   return (
     <Card
-      className={`overflow-hidden transition-all ${
-        completed ? "border-emerald-200 bg-emerald-50/30" : ""
-      }`}
+      className={`overflow-hidden transition-all duration-300 ${
+        completed ? "border-success/30 bg-success-muted/30" : ""
+      } ${popping ? "animate-pop" : ""}`}
     >
-      {/* Header row — always visible */}
-      <button
+      {/* Header row — uses div instead of button to allow nested <a> for video link */}
+      <div
+        role="button"
+        tabIndex={0}
         onClick={() => setExpanded(!expanded)}
+        onKeyDown={handleKeyDown}
         aria-expanded={expanded}
         aria-label={`${exercise.name} — ${targetSets} sets x ${targetReps}`}
-        className="flex w-full items-center justify-between px-4 py-3 text-left"
+        className="flex w-full items-center justify-between px-4 py-3 text-left cursor-pointer"
       >
         <div className="flex-1">
           <div className="flex items-center gap-2">
@@ -118,7 +148,7 @@ export function ExerciseCard({
                 href={exercise.videoUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-semibold text-sm text-blue-600 underline decoration-blue-300 underline-offset-2"
+                className="font-semibold text-sm text-info underline decoration-info/40 underline-offset-2"
                 onClick={(e) => e.stopPropagation()}
               >
                 {exercise.name}
@@ -140,35 +170,16 @@ export function ExerciseCard({
         {/* Done indicator */}
         <div className="flex items-center gap-2">
           {completed && (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              className="h-5 w-5 text-emerald-600"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
-                clipRule="evenodd"
-              />
-            </svg>
+            <CheckCircle2 className="h-5 w-5 text-success" aria-hidden="true" />
           )}
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
+          <ChevronDown
             className={`h-4 w-4 text-muted-foreground transition-transform ${
               expanded ? "rotate-180" : ""
             }`}
-          >
-            <path
-              fillRule="evenodd"
-              d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
-              clipRule="evenodd"
-            />
-          </svg>
+            aria-hidden="true"
+          />
         </div>
-      </button>
+      </div>
 
       {/* Expanded content */}
       {expanded && (
@@ -176,8 +187,8 @@ export function ExerciseCard({
           <FormCueTip cues={exercise.formCues} />
 
           {suggestion && (
-            <div className="rounded-lg bg-blue-50 px-3 py-2">
-              <p className="text-xs font-medium text-blue-700">
+            <div className="rounded-xl bg-info-muted px-3 py-2">
+              <p className="text-xs font-medium text-info">
                 {suggestion.label}
               </p>
             </div>
@@ -201,13 +212,13 @@ export function ExerciseCard({
 
             <button
               onClick={handleToggleComplete}
-              className={`rounded-xl px-6 py-3 text-sm font-bold transition-colors ${
+              className={`rounded-xl px-6 py-4 text-sm font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
                 completed
-                  ? "bg-emerald-600 text-white active:bg-emerald-700"
-                  : "bg-zinc-200 text-zinc-700 active:bg-zinc-300"
+                  ? "bg-success text-success-foreground active:bg-success/90"
+                  : "bg-primary text-primary-foreground active:bg-primary/90"
               }`}
             >
-              {completed ? "Done" : "Mark Done"}
+              {completed ? "Done!" : "Complete"}
             </button>
           </div>
         </CardContent>

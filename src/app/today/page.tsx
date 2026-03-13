@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, Suspense } from "react";
+import { useEffect, useState, useCallback, useMemo, useRef, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { ExerciseCard } from "@/components/workout/exercise-card";
 import { useTemplateForDay, useSetLogs, useProgram } from "@/lib/db/hooks";
@@ -12,6 +12,25 @@ import {
   getDayName,
   getDateForDayInWeek,
 } from "@/lib/utils/dates";
+import { PageHeader } from "@/components/common/page-header";
+
+const CELEBRATION_PHRASES = [
+  "Crushed it!",
+  "Beast mode!",
+  "Stronger than yesterday.",
+  "Another one in the books.",
+  "Future you says thanks.",
+  "That's how it's done.",
+  "Rest now. You earned it.",
+];
+
+function getProgressLabel(completed: number, total: number): string {
+  if (total === 0) return "Progress";
+  if (completed === 0) return "Let's get started";
+  if (completed === total) return "All done!";
+  const remaining = total - completed;
+  return `${remaining} to go`;
+}
 
 function TodayContent() {
   const searchParams = useSearchParams();
@@ -37,12 +56,21 @@ function TodayContent() {
   const [isFinished, setIsFinished] = useState(false);
   const setLogs = useSetLogs(workoutLogId ?? undefined);
 
-  // Create or find workout log
+  // Debounced notes save
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  // Celebration phrase (stable per mount)
+  const celebrationPhrase = useMemo(
+    () => CELEBRATION_PHRASES[Math.floor(Math.random() * CELEBRATION_PHRASES.length)],
+    []
+  );
+
+  // Create or find workout log — use date-specific ID to prevent collisions
   useEffect(() => {
     if (!template) return;
 
     (async () => {
-      const logId = `log-${template.id}`;
+      const logId = `log-${template.id}-${dateStr}`;
       const existing = await db.workoutLogs.get(logId);
 
       if (existing) {
@@ -70,12 +98,18 @@ function TodayContent() {
       completedAt: new Date().toISOString(),
     });
     setIsFinished(true);
+    navigator.vibrate?.([50, 100, 50]);
   }, [workoutLogId]);
 
   if (!template || !program) {
     return (
-      <div className="flex h-[60vh] items-center justify-center">
-        <p className="text-muted-foreground">Loading...</p>
+      <div className="flex h-[60vh] flex-col items-center justify-center gap-3">
+        <div className="flex gap-1.5 text-muted-foreground">
+          <span className="loading-dot" />
+          <span className="loading-dot" />
+          <span className="loading-dot" />
+        </div>
+        <p className="text-sm text-muted-foreground">Getting your workout ready...</p>
       </div>
     );
   }
@@ -84,28 +118,26 @@ function TodayContent() {
   const completedCount =
     setLogs?.filter((s) => s.completed).length || 0;
   const totalCount = template.exercises.length;
+  const progressPct = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
 
   return (
     <div className="space-y-4 px-4 pt-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold">{template.dayLabel}</h1>
-        <p className="text-sm text-muted-foreground">
-          {getDayName(dayOfWeek)} · Week {weekNumber} of {program.weeks} ·{" "}
-          {program.phase}
-        </p>
-      </div>
+      <PageHeader
+        title={template.dayLabel}
+        subtitle={`${getDayName(dayOfWeek)} · Week ${weekNumber} of ${program.weeks} · ${program.phase}`}
+      />
 
       {/* Progress bar */}
       <div className="space-y-1">
         <div className="flex justify-between text-xs text-muted-foreground">
-          <span>Progress</span>
+          <span>{getProgressLabel(completedCount, totalCount)}</span>
           <span>
             {completedCount}/{totalCount} exercises
           </span>
         </div>
         <div
-          className="h-2 w-full overflow-hidden rounded-full bg-muted"
+          className="h-3 w-full overflow-hidden rounded-full bg-muted"
           role="progressbar"
           aria-valuenow={completedCount}
           aria-valuemin={0}
@@ -113,9 +145,13 @@ function TodayContent() {
           aria-label={`${completedCount} of ${totalCount} exercises completed`}
         >
           <div
-            className="h-full rounded-full bg-emerald-500 transition-all duration-500"
+            className="h-full rounded-full transition-all duration-700 ease-out"
             style={{
-              width: `${totalCount > 0 ? (completedCount / totalCount) * 100 : 0}%`,
+              width: `${progressPct}%`,
+              background:
+                completedCount === totalCount && totalCount > 0
+                  ? "var(--success)"
+                  : "linear-gradient(90deg, var(--info), var(--success))",
             }}
           />
         </div>
@@ -142,9 +178,12 @@ function TodayContent() {
 
       {/* Finish Button / Completed State */}
       {isFinished ? (
-        <div className="rounded-2xl bg-emerald-50 py-4 text-center">
-          <p className="text-lg font-bold text-emerald-700">
-            Workout Complete!
+        <div className="animate-slide-up rounded-2xl bg-success-muted py-6 text-center">
+          <p className="text-2xl font-bold text-success">
+            Workout Complete
+          </p>
+          <p className="mt-1 text-sm text-success/80 italic">
+            {celebrationPhrase}
           </p>
         </div>
       ) : (
@@ -152,7 +191,7 @@ function TodayContent() {
         totalCount > 0 && (
           <button
             onClick={handleFinishWorkout}
-            className="w-full rounded-2xl bg-emerald-600 py-4 text-lg font-bold text-white shadow-lg transition-colors active:bg-emerald-700"
+            className="w-full rounded-2xl bg-success py-4 text-lg font-bold text-success-foreground shadow-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:bg-success/90"
           >
             Finish Workout
           </button>
@@ -161,22 +200,35 @@ function TodayContent() {
 
       {/* Daily Log */}
       <div className="pb-6">
-        <label className="text-xs font-semibold uppercase text-muted-foreground">
+        <label
+          htmlFor="daily-log"
+          className="text-xs font-semibold uppercase text-muted-foreground"
+        >
           Daily Log
         </label>
         <textarea
+          id="daily-log"
           className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground/60 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-          placeholder="Notes on today's workout, energy levels..."
+          placeholder={
+            [
+              "How are you feeling today?",
+              "Energy level? Mood? Wins?",
+              "Anything worth remembering about today?",
+              "What went well? What was tough?",
+            ][new Date().getDay() % 4]
+          }
           rows={3}
           value={workoutNotes}
-          onChange={async (e) => {
+          onChange={(e) => {
             const val = e.target.value;
             setWorkoutNotes(val);
-            if (workoutLogId) {
-              await db.workoutLogs.update(workoutLogId, {
-                notes: val,
-              });
-            }
+            // Debounce DB write
+            clearTimeout(debounceRef.current);
+            debounceRef.current = setTimeout(async () => {
+              if (workoutLogId) {
+                await db.workoutLogs.update(workoutLogId, { notes: val });
+              }
+            }, 500);
           }}
         />
       </div>
@@ -188,8 +240,13 @@ export default function TodayPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex h-[60vh] items-center justify-center">
-          <p className="text-muted-foreground">Loading...</p>
+        <div className="flex h-[60vh] flex-col items-center justify-center gap-3">
+          <div className="flex gap-1.5 text-muted-foreground">
+            <span className="loading-dot" />
+            <span className="loading-dot" />
+            <span className="loading-dot" />
+          </div>
+          <p className="text-sm text-muted-foreground">Getting your workout ready...</p>
         </div>
       }
     >

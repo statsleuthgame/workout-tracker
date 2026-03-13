@@ -1,7 +1,7 @@
 const PROGRAM_START = "2026-03-08"; // Sunday, Week 1
 
 export function getWeekNumber(date: Date = new Date()): number {
-  const start = new Date(PROGRAM_START);
+  const start = new Date(PROGRAM_START + "T12:00:00");
   const diff = date.getTime() - start.getTime();
   const daysDiff = Math.floor(diff / (1000 * 60 * 60 * 24));
   const week = Math.floor(daysDiff / 7) + 1;
@@ -36,7 +36,7 @@ export function getDayAbbrev(dayOfWeek: number): string {
 }
 
 export function getDateForDayInWeek(weekNumber: number, dayOfWeek: number): Date {
-  const start = new Date(PROGRAM_START);
+  const start = new Date(PROGRAM_START + "T12:00:00");
   const dayOffset = (weekNumber - 1) * 7 + dayOfWeek;
   const date = new Date(start);
   date.setDate(start.getDate() + dayOffset);
