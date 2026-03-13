@@ -3,29 +3,29 @@ import { exerciseLibrary } from "../workout-plan/exercises";
 import { weeklyTemplate, getExercisesForDayWeek } from "../workout-plan/templates";
 
 const PROGRAM_ID = "march-26-protocol";
+const SEED_VERSION = 2; // bump this to force re-seed of templates & exercises
 
 export async function seedDatabase() {
-  // Check if already seeded
-  const existingProgram = await db.programs.get(PROGRAM_ID);
-  if (existingProgram) return;
+  const settings = await db.userSettings.get("default");
+  const needsReseed = !settings || settings.seedVersion !== SEED_VERSION;
 
-  // Seed exercise library
+  if (!needsReseed) return;
+
+  // Always update exercises (adds videoUrl, removes partner exercises)
   await db.exercises.bulkPut(exerciseLibrary);
 
-  // Seed program
+  // Seed or update program
   await db.programs.put({
     id: PROGRAM_ID,
     name: "March '26 Protocol",
     phase: "Phase 4: Volume & Intensity",
-    startDate: "2026-03-08", // Week 1 starts Sunday March 8
+    startDate: "2026-03-08",
     weeks: 5,
-    proteinGoalG: 130,
-    waterGoalL: 3,
     weightLossTarget: "5-7 lbs",
     createdAt: new Date().toISOString(),
   });
 
-  // Seed workout templates for all 5 weeks x 7 days
+  // Reseed all workout templates (Saturday changed to full body, etc.)
   const templates = [];
   for (let week = 1; week <= 5; week++) {
     for (const day of weeklyTemplate) {
@@ -42,7 +42,7 @@ export async function seedDatabase() {
   }
   await db.workoutTemplates.bulkPut(templates);
 
-  // Seed default settings
+  // Update settings with seed version
   await db.userSettings.put({
     id: "default",
     name: "",
@@ -50,5 +50,6 @@ export async function seedDatabase() {
     restTimerDefault: 90,
     theme: "system",
     programStartDate: "2026-03-08",
+    seedVersion: SEED_VERSION,
   });
 }

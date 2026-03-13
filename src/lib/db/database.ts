@@ -8,8 +8,6 @@ export interface Program {
   phase: string;
   startDate: string; // ISO date
   weeks: number;
-  proteinGoalG: number;
-  waterGoalL: number;
   weightLossTarget: string;
   createdAt: string;
 }
@@ -20,6 +18,7 @@ export interface Exercise {
   muscleGroup: string;
   equipment: string;
   formCues: string[];
+  videoUrl?: string;
 }
 
 export interface TemplateExercise {
@@ -79,6 +78,7 @@ export interface UserSettings {
   restTimerDefault: number;
   theme: "light" | "dark" | "system";
   programStartDate?: string;
+  seedVersion?: number;
 }
 
 // ---- Database ----
@@ -93,7 +93,7 @@ const db = new Dexie("WorkoutDB") as Dexie & {
   userSettings: EntityTable<UserSettings, "id">;
 };
 
-db.version(1).stores({
+db.version(2).stores({
   programs: "id, name",
   exercises: "id, name, muscleGroup, equipment",
   workoutTemplates: "id, programId, [programId+weekNumber+dayOfWeek], weekNumber, dayOfWeek",

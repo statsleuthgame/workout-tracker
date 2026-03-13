@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { useSearchParams } from "next/navigation";
 import { ExerciseCard } from "@/components/workout/exercise-card";
 import { RestTimer } from "@/components/workout/rest-timer";
 import { useTemplateForDay, useSetLogs, useProgram } from "@/lib/db/hooks";
@@ -15,38 +14,42 @@ import {
 } from "@/lib/utils/dates";
 
 export default function TodayPage() {
+  const searchParams = useSearchParams();
   const today = new Date();
-  const weekNumber = getWeekNumber(today);
-  const dayOfWeek = getDayOfWeek(today);
-  const dateStr = getDateString(today);
+
+  // Use query params if provided (from week view), otherwise use today's date
+  const paramWeek = searchParams.get("week");
+  const paramDay = searchParams.get("day");
+
+  const weekNumber = paramWeek ? parseInt(paramWeek) : getWeekNumber(today);
+  const dayOfWeek = paramDay !== null ? parseInt(paramDay) : getDayOfWeek(today);
+  const dateStr = paramWeek ? `${weekNumber}-${dayOfWeek}` : getDateString(today);
 
   const program = useProgram();
   const template = useTemplateForDay(weekNumber, dayOfWeek);
   const [workoutLogId, setWorkoutLogId] = useState<string | null>(null);
   const setLogs = useSetLogs(workoutLogId ?? undefined);
 
-  // Create or find workout log for today
+  // Create or find workout log
   useEffect(() => {
     if (!template) return;
 
     (async () => {
-      const existing = await db.workoutLogs
-        .where("date")
-        .equals(dateStr)
-        .first();
+      // Use a unique ID based on the template to avoid conflicts
+      const logId = `log-${template.id}`;
+      const existing = await db.workoutLogs.get(logId);
 
       if (existing) {
         setWorkoutLogId(existing.id);
       } else {
-        const id = `log-${dateStr}-${template.id}`;
         await db.workoutLogs.put({
-          id,
+          id: logId,
           templateId: template.id,
-          date: dateStr,
+          date: getDateString(today),
           startedAt: new Date().toISOString(),
           notes: "",
         });
-        setWorkoutLogId(id);
+        setWorkoutLogId(logId);
       }
     })();
   }, [template, dateStr]);
@@ -76,28 +79,11 @@ export default function TodayPage() {
     <div className="space-y-4 px-4 pt-6">
       {/* Header */}
       <div>
-        <div className="flex items-center gap-2">
-          <h1 className="text-2xl font-bold">{template.dayLabel}</h1>
-          {template.dayTheme === "partner" && (
-            <span className="text-xl">❤️</span>
-          )}
-        </div>
+        <h1 className="text-2xl font-bold">{template.dayLabel}</h1>
         <p className="text-sm text-muted-foreground">
           {getDayName(dayOfWeek)} · Week {weekNumber} of {program.weeks} ·{" "}
           {program.phase}
         </p>
-      </div>
-
-      {/* Nutrition Goals */}
-      <div className="flex gap-3">
-        <Card className="flex-1 px-3 py-2 text-center">
-          <p className="text-xs font-medium text-muted-foreground">Protein</p>
-          <p className="text-lg font-bold">{program.proteinGoalG}g</p>
-        </Card>
-        <Card className="flex-1 px-3 py-2 text-center">
-          <p className="text-xs font-medium text-muted-foreground">Water</p>
-          <p className="text-lg font-bold">{program.waterGoalL}L+</p>
-        </Card>
       </div>
 
       {/* Progress bar */}

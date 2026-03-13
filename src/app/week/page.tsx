@@ -99,9 +99,6 @@ export default function WeekPage() {
                     <h3 className="font-semibold text-sm">
                       {template.dayLabel}
                     </h3>
-                    {template.dayTheme === "partner" && (
-                      <span className="text-sm">❤️</span>
-                    )}
                   </div>
                   <p className="text-xs text-muted-foreground">
                     {template.exercises.length} Exercises

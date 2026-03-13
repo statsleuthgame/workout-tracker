@@ -113,7 +113,19 @@ export function ExerciseCard({
       >
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <h3 className="font-semibold text-sm">{exercise.name}</h3>
+            {exercise.videoUrl ? (
+              <a
+                href={exercise.videoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold text-sm text-blue-600 underline decoration-blue-300 underline-offset-2"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {exercise.name}
+              </a>
+            ) : (
+              <h3 className="font-semibold text-sm">{exercise.name}</h3>
+            )}
             {slotType === "rotating" && (
               <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
                 Rotating
