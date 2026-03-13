@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { seedDatabase } from "@/lib/db/seed";
+import { initSync } from "@/lib/sync/sync-init";
 
 export function DbProvider({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    seedDatabase().then(() => setReady(true));
+    seedDatabase().then(() => initSync()).then(() => setReady(true));
   }, []);
 
   if (!ready) {

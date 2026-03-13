@@ -81,6 +81,14 @@ export interface UserSettings {
   seedVersion?: number;
 }
 
+export interface SyncQueueItem {
+  queueId?: number;
+  tableName: string;
+  recordId: string;
+  data: unknown;
+  createdAt: string;
+}
+
 // ---- Database ----
 
 const db = new Dexie("WorkoutDB") as Dexie & {
@@ -91,6 +99,7 @@ const db = new Dexie("WorkoutDB") as Dexie & {
   setLogs: EntityTable<SetLog, "id">;
   bodyMetrics: EntityTable<BodyMetric, "id">;
   userSettings: EntityTable<UserSettings, "id">;
+  syncQueue: EntityTable<SyncQueueItem, "queueId">;
 };
 
 db.version(2).stores({
@@ -101,6 +110,17 @@ db.version(2).stores({
   setLogs: "id, workoutLogId, exerciseId, [workoutLogId+exerciseId]",
   bodyMetrics: "id, date",
   userSettings: "id",
+});
+
+db.version(3).stores({
+  programs: "id, name",
+  exercises: "id, name, muscleGroup, equipment",
+  workoutTemplates: "id, programId, [programId+weekNumber+dayOfWeek], weekNumber, dayOfWeek",
+  workoutLogs: "id, templateId, date",
+  setLogs: "id, workoutLogId, exerciseId, [workoutLogId+exerciseId]",
+  bodyMetrics: "id, date",
+  userSettings: "id",
+  syncQueue: "++queueId, tableName, recordId, createdAt",
 });
 
 export { db };
