@@ -81,9 +81,15 @@ export default function WeekPage() {
         <StatCard label="Remaining" value={totalDays - completedDays} />
       </div>
 
-      {/* Day Cards */}
+      {/* Day Cards — rotate so today is first when viewing current week */}
       <div className="space-y-2">
-        {templates?.map((template) => {
+        {(selectedWeek === currentWeek && templates
+          ? [...templates].sort((a, b) => {
+              const today = new Date().getDay();
+              return ((a.dayOfWeek - today + 7) % 7) - ((b.dayOfWeek - today + 7) % 7);
+            })
+          : templates
+        )?.map((template) => {
           const date = getDateForDayInWeek(selectedWeek, template.dayOfWeek);
           const dayNum = date.getDate();
           const isCompleted = completedTemplateIds.has(template.id);

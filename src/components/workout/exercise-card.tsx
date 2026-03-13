@@ -9,6 +9,7 @@ import { db, type SetLog } from "@/lib/db/database";
 import { useExercise } from "@/lib/db/hooks";
 import {
   calculateProgression,
+  getLastWeight,
   type ProgressionSuggestion,
 } from "@/lib/progression/engine";
 import { CheckCircle2, ChevronDown } from "lucide-react";
@@ -44,10 +45,14 @@ export function ExerciseCard({
   );
   const [popping, setPopping] = useState(false);
   const popTimeout = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const hasAutoFilled = useRef(false);
+
+  const isCardio = targetReps.toLowerCase().includes("min");
 
   useEffect(() => {
+    if (isCardio) return;
     calculateProgression(exerciseId, targetReps).then(setSuggestion);
-  }, [exerciseId, targetReps]);
+  }, [exerciseId, targetReps, isCardio]);
 
   // Find existing log for this exercise (single record per exercise)
   const existingLog = existingSets.find(
@@ -58,6 +63,38 @@ export function ExerciseCard({
   const weight = existingLog?.actualWeight;
 
   const setId = `${workoutLogId}-${exerciseId}-1`;
+
+  // Auto-fill weight from last workout if no weight entered yet
+  useEffect(() => {
+    if (isCardio || hasAutoFilled.current) return;
+    if (existingLog?.actualWeight) {
+      hasAutoFilled.current = true;
+      return;
+    }
+    getLastWeight(exerciseId).then((lastWeight) => {
+      if (lastWeight && !hasAutoFilled.current) {
+        hasAutoFilled.current = true;
+        // Save to DB so it persists
+        db.setLogs.get(setId).then((existing) => {
+          if (existing) {
+            if (!existing.actualWeight) {
+              db.setLogs.update(setId, { actualWeight: lastWeight });
+            }
+          } else {
+            db.setLogs.put({
+              id: setId,
+              workoutLogId,
+              exerciseId,
+              setNumber: 1,
+              targetReps: parseTargetReps(targetReps),
+              actualWeight: lastWeight,
+              completed: false,
+            });
+          }
+        });
+      }
+    });
+  }, [exerciseId, setId, existingLog?.actualWeight, isCardio, workoutLogId, targetReps]);
 
   const handleToggleComplete = useCallback(async () => {
     const newCompleted = !completed;
@@ -165,7 +202,7 @@ export function ExerciseCard({
             )}
           </div>
           <p className="text-xs text-muted-foreground mt-0.5">
-            {targetSets} sets x {targetReps} · {notes}
+            {isCardio ? targetReps : `${targetSets} sets x ${targetReps}`} · {notes}
           </p>
         </div>
 
@@ -186,7 +223,7 @@ export function ExerciseCard({
         <CardContent className="space-y-3 pl-5 pr-4 pb-4 pt-0">
           <FormCueTip cues={exercise.formCues} />
 
-          {suggestion && (
+          {!isCardio && suggestion && (
             <div className="rounded-xl bg-info-muted/60 px-3 py-2 border border-info/10">
               <p className="text-xs font-semibold text-info">
                 {suggestion.label}
@@ -195,17 +232,25 @@ export function ExerciseCard({
           )}
 
           <div className="flex items-center gap-3 rounded-2xl bg-muted/40 px-3 py-3">
-            <div className="text-center">
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">
-                Weight (lbs)
+            {!isCardio && (
+              <div className="text-center">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">
+                  Weight (lbs)
+                </p>
+                <NumberInput
+                  value={weight}
+                  onChange={handleWeightChange}
+                  placeholder="Lbs"
+                  step={5}
+                />
+              </div>
+            )}
+
+            {isCardio && (
+              <p className="text-sm font-semibold text-muted-foreground">
+                {targetReps}
               </p>
-              <NumberInput
-                value={weight}
-                onChange={handleWeightChange}
-                placeholder="Lbs"
-                step={5}
-              />
-            </div>
+            )}
 
             <div className="flex-1" />
 

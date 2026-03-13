@@ -115,6 +115,16 @@ const monday: DayTemplate = {
         restSeconds: 45,
         notes: "Control the eccentric, no swinging",
       },
+      // Cardio
+      {
+        slotName: "Cardio: Incline Walk",
+        slotType: "fixed" as const,
+        exercisesByWeek: fixed("incline-walk"),
+        setsByWeek: { 1: 1, 2: 1, 3: 1, 4: 1, 5: 1 },
+        repsByWeek: { 1: "30 min", 2: "30 min", 3: "30 min", 4: "30 min", 5: "30 min" },
+        restSeconds: 0,
+        notes: "Incline 10-15%, no holding handrails",
+      },
     ];
   })(),
 };
@@ -300,6 +310,16 @@ const thursday: DayTemplate = {
         repsByWeek: { 1: "8", 2: "10", 3: "10", 4: "12", 5: "12" },
         restSeconds: 45,
         notes: "Brace core hard, don't arch back",
+      },
+      // Cardio
+      {
+        slotName: "Cardio: Incline Walk",
+        slotType: "fixed" as const,
+        exercisesByWeek: fixed("incline-walk"),
+        setsByWeek: { 1: 1, 2: 1, 3: 1, 4: 1, 5: 1 },
+        repsByWeek: { 1: "25 min", 2: "25 min", 3: "25 min", 4: "25 min", 5: "25 min" },
+        restSeconds: 0,
+        notes: "Incline 10-15%, no holding handrails",
       },
     ];
   })(),
