@@ -3,7 +3,7 @@ import { exerciseLibrary } from "../workout-plan/exercises";
 import { weeklyTemplate, getExercisesForDayWeek } from "../workout-plan/templates";
 
 const PROGRAM_ID = "march-26-protocol";
-const SEED_VERSION = 4; // bump this to force re-seed of templates & exercises
+const SEED_VERSION = 5; // bump this to force re-seed of templates & exercises
 
 export async function seedDatabase() {
   const settings = await db.userSettings.get("default");

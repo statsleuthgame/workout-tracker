@@ -6,6 +6,7 @@ export const THEME_COLORS: Record<string, { bg: string; text: string; dot: strin
   "legs-foundation":  { bg: "bg-amber-500/10", text: "text-amber-600 dark:text-amber-400", dot: "bg-amber-500", border: "border-l-amber-500" },
   "legs-hypertrophy": { bg: "bg-orange-500/10", text: "text-orange-600 dark:text-orange-400", dot: "bg-orange-500", border: "border-l-orange-500" },
   "recovery":         { bg: "bg-emerald-500/10", text: "text-emerald-600 dark:text-emerald-400", dot: "bg-emerald-500", border: "border-l-emerald-500" },
+  "rest":             { bg: "bg-slate-500/10", text: "text-slate-500 dark:text-slate-400", dot: "bg-slate-400", border: "border-l-slate-400" },
 };
 
 const DEFAULT_THEME = { bg: "bg-muted/60", text: "text-muted-foreground", dot: "bg-muted-foreground", border: "border-l-muted-foreground" };
@@ -23,6 +24,7 @@ export function getThemeLabel(dayTheme: string): string {
     "legs-foundation": "Legs · Foundation",
     "legs-hypertrophy": "Legs · Hypertrophy",
     "recovery": "Active Recovery",
+    "rest": "Rest Day",
   };
   return labels[dayTheme] ?? dayTheme;
 }

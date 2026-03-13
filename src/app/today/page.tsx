@@ -114,6 +114,25 @@ function TodayContent() {
     );
   }
 
+  // Rest day — no exercises
+  if (template.dayTheme === "rest") {
+    return (
+      <div className="space-y-4 px-4 pt-6">
+        <PageHeader
+          title="Rest Day"
+          subtitle={`${getDayName(dayOfWeek)} · Week ${weekNumber} of ${program.weeks}`}
+        />
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <div className="mb-4 text-5xl">&#9749;</div>
+          <p className="text-xl font-extrabold gradient-text">No workout today</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Rest, recover, and come back stronger tomorrow.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   // Count completed exercises (1 record per exercise in simplified model)
   const completedCount =
     setLogs?.filter((s) => s.completed).length || 0;

@@ -39,22 +39,12 @@ function variety2of3(a: string, b: string, c: string): [Record<number, string>, 
   ];
 }
 
-// ===== SUNDAY: Active Recovery =====
+// ===== SUNDAY: Rest Day =====
 const sunday: DayTemplate = {
-  dayLabel: "Active Recovery",
-  dayTheme: "recovery",
+  dayLabel: "Rest Day",
+  dayTheme: "rest",
   dayOfWeek: 0,
-  slots: [
-    {
-      slotName: "Light Cardio",
-      slotType: "fixed",
-      exercisesByWeek: fixed("incline-walk"),
-      setsByWeek: { 1: 1, 2: 1, 3: 1, 4: 1, 5: 1 },
-      repsByWeek: { 1: "20 min", 2: "20 min", 3: "25 min", 4: "20 min", 5: "25 min" },
-      restSeconds: 0,
-      notes: "Walking, stretching, or yoga",
-    },
-  ],
+  slots: [],
 };
 
 // ===== MONDAY: Pull (Back Focus) =====
@@ -177,6 +167,16 @@ const tuesday: DayTemplate = {
         restSeconds: 60,
         notes: "Squeeze and control",
       },
+      // Variety 3 (extra to balance time with walk days)
+      {
+        slotName: "Variety",
+        slotType: "fixed" as const,
+        exercisesByWeek: fixed("skullcrusher"),
+        setsByWeek: PROG_3_ALL,
+        repsByWeek: { 1: "10-12", 2: "12", 3: "12-15", 4: "10-12", 5: "12-15" },
+        restSeconds: 60,
+        notes: "Keep elbows tucked, lower to forehead",
+      },
       // Core
       {
         slotName: "Core",
@@ -238,6 +238,16 @@ const wednesday: DayTemplate = {
         repsByWeek: { 1: "12", 2: "15", 3: "15", 4: "12", 5: "15" },
         restSeconds: 60,
         notes: "Lighter weight, higher reps",
+      },
+      // Variety 3 (extra to balance time with walk days)
+      {
+        slotName: "Variety",
+        slotType: "fixed" as const,
+        exercisesByWeek: fixed("hack-squat"),
+        setsByWeek: PROG_3_ALL,
+        repsByWeek: { 1: "10-12", 2: "12", 3: "12-15", 4: "10-12", 5: "12" },
+        restSeconds: 90,
+        notes: "Full depth, feet shoulder width",
       },
       // Core
       {
@@ -373,6 +383,16 @@ const friday: DayTemplate = {
         restSeconds: 45,
         notes: "Burnout finisher",
       },
+      // Variety 3 (extra to balance time with walk days)
+      {
+        slotName: "Variety",
+        slotType: "fixed" as const,
+        exercisesByWeek: fixed("overhead-tricep"),
+        setsByWeek: PROG_3_ALL,
+        repsByWeek: { 1: "12", 2: "12-15", 3: "15", 4: "12", 5: "12-15" },
+        restSeconds: 60,
+        notes: "Full stretch overhead, elbows close to ears",
+      },
       // Core
       {
         slotName: "Core",
@@ -397,13 +417,13 @@ const saturday: DayTemplate = {
     return [
       // Anchor 1
       {
-        slotName: "Anchor: Bulgarian Split Squats",
+        slotName: "Anchor: Hip Thrusts",
         slotType: "fixed" as const,
-        exercisesByWeek: fixed("bulgarian-split"),
+        exercisesByWeek: fixed("hip-thrust"),
         setsByWeek: PROG_3_TO_4,
-        repsByWeek: { 1: "10/side", 2: "10/side", 3: "12/side", 4: "10/side", 5: "12/side" },
+        repsByWeek: { 1: "10-12", 2: "12", 3: "12-15", 4: "10-12", 5: "12-15" },
         restSeconds: 90,
-        notes: "Back foot on bench, torso upright",
+        notes: "Squeeze glutes at top, chin tucked, pause at top",
       },
       // Anchor 2
       {
@@ -434,6 +454,16 @@ const saturday: DayTemplate = {
         repsByWeek: { 1: "12-15", 2: "15", 3: "15", 4: "12-15", 5: "15" },
         restSeconds: 60,
         notes: "Higher reps, chase the pump",
+      },
+      // Variety 3 (extra to balance time with walk days)
+      {
+        slotName: "Variety",
+        slotType: "fixed" as const,
+        exercisesByWeek: fixed("calf-raise"),
+        setsByWeek: PROG_3_ALL,
+        repsByWeek: { 1: "15", 2: "15-20", 3: "20", 4: "15", 5: "15-20" },
+        restSeconds: 45,
+        notes: "Full stretch at bottom, pause at top",
       },
       // Core
       {
