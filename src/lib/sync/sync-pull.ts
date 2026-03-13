@@ -1,5 +1,5 @@
 import { db } from "../db/database";
-import { supabase } from "./supabase";
+import { getSupabase } from "./supabase";
 import { setIsPulling } from "./sync-hooks";
 import type { WorkoutLog, SetLog, BodyMetric } from "../db/database";
 
@@ -45,6 +45,9 @@ export async function pullFromCloud(): Promise<boolean> {
   if (localCount > 0) return false;
 
   if (!navigator.onLine) return false;
+
+  const supabase = getSupabase();
+  if (!supabase) return false;
 
   try {
     const [wlRes, slRes, bmRes] = await Promise.all([

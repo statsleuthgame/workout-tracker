@@ -1,4 +1,4 @@
-import { supabase } from "./supabase";
+import { getSupabase } from "./supabase";
 import { dequeueAll, removeProcessed } from "./sync-queue";
 
 // camelCase to snake_case field mapping per table
@@ -57,6 +57,8 @@ let pushing = false;
 
 export async function pushPendingChanges() {
   if (pushing || !navigator.onLine) return;
+  const supabase = getSupabase();
+  if (!supabase) return;
   pushing = true;
 
   try {

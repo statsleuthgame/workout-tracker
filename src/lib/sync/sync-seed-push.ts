@@ -1,5 +1,5 @@
 import { db } from "../db/database";
-import { supabase } from "./supabase";
+import { getSupabase } from "./supabase";
 
 // Field mappers (same as sync-push but we need them here for the initial bulk push)
 function mapWorkoutLog(log: Record<string, unknown>) {
@@ -46,6 +46,8 @@ let hasRun = false;
  */
 export async function pushAllExistingData() {
   if (hasRun || !navigator.onLine) return;
+  const supabase = getSupabase();
+  if (!supabase) return;
   hasRun = true;
 
   try {
