@@ -54,13 +54,13 @@ export default function WeekPage() {
           <button
             key={week}
             onClick={() => setSelectedWeek(week)}
-            className={`flex-1 rounded-xl py-3 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+            className={`flex-1 rounded-2xl py-3 text-sm font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
               selectedWeek === week
-                ? "bg-primary text-primary-foreground"
-                : "bg-muted text-muted-foreground hover:bg-muted/80"
+                ? "btn-gradient-primary text-primary-foreground"
+                : "glass-card text-muted-foreground hover:text-foreground"
             }`}
           >
-            Week {week}
+            W{week}
           </button>
         ))}
       </div>
@@ -80,43 +80,41 @@ export default function WeekPage() {
               href={`/today?week=${selectedWeek}&day=${template.dayOfWeek}`}
             >
               <Card
-                className={`flex items-center gap-4 px-4 py-3 transition-colors hover:bg-muted/50 ${
-                  isToday ? "border-primary" : ""
-                } ${isCompleted ? "bg-success-muted/50" : ""}`}
+                className={`flex items-center gap-4 px-4 py-3.5 transition-all hover:translate-x-0.5 ${
+                  isToday ? "glass-card-elevated" : ""
+                } ${isCompleted ? "bg-success-muted/20" : ""}`}
               >
                 <div
-                  className={`flex h-12 w-12 flex-col items-center justify-center rounded-xl ${
+                  className={`flex h-12 w-12 flex-col items-center justify-center rounded-xl font-bold ${
                     isToday
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted"
+                      ? "btn-gradient-primary text-primary-foreground"
+                      : "bg-muted/60"
                   }`}
                 >
-                  <span className="text-[10px] font-bold leading-none">
+                  <span className="text-[10px] leading-none tracking-wider">
                     {getDayAbbrev(template.dayOfWeek)}
                   </span>
-                  <span className="text-lg font-bold leading-tight">
+                  <span className="text-lg leading-tight">
                     {dayNum}
                   </span>
                 </div>
 
                 <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-semibold text-sm">
-                      {template.dayLabel}
-                    </h3>
-                  </div>
+                  <h3 className="font-bold text-sm">
+                    {template.dayLabel}
+                  </h3>
                   <p className="text-xs text-muted-foreground">
                     {template.exercises.length} Exercises
                   </p>
                 </div>
 
                 {isCompleted && (
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-success-muted">
-                    <Check className="h-5 w-5 text-success" aria-hidden="true" />
+                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-success/15">
+                    <Check className="h-4 w-4 text-success" aria-hidden="true" />
                   </div>
                 )}
 
-                <ChevronRight className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+                <ChevronRight className={`h-4 w-4 transition-colors ${isToday ? "text-primary" : "text-muted-foreground"}`} aria-hidden="true" />
               </Card>
             </Link>
           );

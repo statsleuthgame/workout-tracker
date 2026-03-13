@@ -129,8 +129,8 @@ export default function ProgressPage() {
 
       {/* Body Weight Trend */}
       {weightData.length > 1 && (
-        <Card className="p-4">
-          <h2 className="mb-3 text-sm font-semibold">Body Weight</h2>
+        <Card className="p-5">
+          <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Body Weight</h2>
           <ResponsiveContainer width="100%" height={180}>
             <LineChart data={weightData}>
               <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />
@@ -156,8 +156,8 @@ export default function ProgressPage() {
 
       {/* Weekly Volume */}
       {weeklyVolume && weeklyVolume.length > 0 && (
-        <Card className="p-4">
-          <h2 className="mb-3 text-sm font-semibold">Weekly Volume (Sets)</h2>
+        <Card className="p-5">
+          <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Weekly Volume (Sets)</h2>
           <ResponsiveContainer width="100%" height={180}>
             <BarChart data={weeklyVolume}>
               <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />
@@ -173,8 +173,8 @@ export default function ProgressPage() {
       {/* Exercise Progress Charts */}
       {exerciseProgress &&
         exerciseProgress.map((ex) => (
-          <Card key={ex.name} className="p-4">
-            <h2 className="mb-3 text-sm font-semibold">{ex.name}</h2>
+          <Card key={ex.name} className="p-5">
+            <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{ex.name}</h2>
             <ResponsiveContainer width="100%" height={150}>
               <LineChart data={ex.data}>
                 <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />
@@ -204,9 +204,9 @@ export default function ProgressPage() {
 
       {/* Empty State */}
       {completedWorkouts.length === 0 && (
-        <Card className="px-4 py-8 text-center">
-          <p className="text-lg font-semibold">The best graphs start somewhere</p>
-          <p className="text-sm text-muted-foreground">
+        <Card className="px-4 py-10 text-center">
+          <p className="text-xl font-extrabold gradient-text">The best graphs start somewhere</p>
+          <p className="mt-1 text-sm text-muted-foreground">
             Complete a workout and watch the data roll in.
           </p>
         </Card>

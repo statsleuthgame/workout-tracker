@@ -129,15 +129,15 @@ function TodayContent() {
       />
 
       {/* Progress bar */}
-      <div className="space-y-1">
-        <div className="flex justify-between text-xs text-muted-foreground">
+      <div className="space-y-1.5">
+        <div className="flex justify-between text-xs font-medium text-muted-foreground">
           <span>{getProgressLabel(completedCount, totalCount)}</span>
           <span>
             {completedCount}/{totalCount} exercises
           </span>
         </div>
         <div
-          className="h-3 w-full overflow-hidden rounded-full bg-muted"
+          className="h-3.5 w-full overflow-hidden rounded-full bg-muted/60"
           role="progressbar"
           aria-valuenow={completedCount}
           aria-valuemin={0}
@@ -145,12 +145,14 @@ function TodayContent() {
           aria-label={`${completedCount} of ${totalCount} exercises completed`}
         >
           <div
-            className="h-full rounded-full transition-all duration-700 ease-out"
+            className={`h-full rounded-full transition-all duration-700 ease-out ${
+              progressPct > 0 && progressPct < 100 ? "progress-shimmer" : ""
+            }`}
             style={{
               width: `${progressPct}%`,
               background:
                 completedCount === totalCount && totalCount > 0
-                  ? "var(--success)"
+                  ? "var(--gradient-success)"
                   : "linear-gradient(90deg, var(--info), var(--success))",
             }}
           />
@@ -178,11 +180,11 @@ function TodayContent() {
 
       {/* Finish Button / Completed State */}
       {isFinished ? (
-        <div className="animate-slide-up rounded-2xl bg-success-muted py-6 text-center">
-          <p className="text-2xl font-bold text-success">
+        <div className="animate-confetti glass-card-elevated rounded-2xl py-8 text-center">
+          <p className="text-3xl font-extrabold gradient-text">
             Workout Complete
           </p>
-          <p className="mt-1 text-sm text-success/80 italic">
+          <p className="mt-2 text-sm text-muted-foreground italic">
             {celebrationPhrase}
           </p>
         </div>
@@ -191,7 +193,7 @@ function TodayContent() {
         totalCount > 0 && (
           <button
             onClick={handleFinishWorkout}
-            className="w-full rounded-2xl bg-success py-4 text-lg font-bold text-success-foreground shadow-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:bg-success/90"
+            className="w-full rounded-2xl btn-gradient-success py-4 text-lg font-bold animate-pulse-glow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
             Finish Workout
           </button>
@@ -202,13 +204,13 @@ function TodayContent() {
       <div className="pb-6">
         <label
           htmlFor="daily-log"
-          className="text-xs font-semibold uppercase text-muted-foreground"
+          className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground"
         >
           Daily Log
         </label>
         <textarea
           id="daily-log"
-          className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground/60 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+          className="mt-1.5 w-full rounded-2xl border border-border/50 bg-card/50 backdrop-blur px-4 py-3 text-sm placeholder:text-muted-foreground/50 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
           placeholder={
             [
               "How are you feeling today?",

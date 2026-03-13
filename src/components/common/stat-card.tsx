@@ -9,10 +9,12 @@ interface StatCardProps {
 
 export function StatCard({ label, value, className = "", children }: StatCardProps) {
   return (
-    <Card className={`flex-1 px-3 py-2 text-center ${className}`}>
-      <p className="text-xs font-medium text-muted-foreground">{label}</p>
-      <div className="flex items-center justify-center gap-1">
-        <p className="text-3xl font-bold">{value}</p>
+    <Card className={`flex-1 px-3 py-3 text-center ${className}`}>
+      <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+        {label}
+      </p>
+      <div className="flex items-center justify-center gap-1 mt-0.5">
+        <p className="text-2xl font-extrabold tracking-tight">{value}</p>
         {children}
       </div>
     </Card>

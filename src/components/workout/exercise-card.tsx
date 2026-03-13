@@ -127,11 +127,10 @@ export function ExerciseCard({
 
   return (
     <Card
-      className={`overflow-hidden transition-all duration-300 ${
-        completed ? "border-success/30 bg-success-muted/30" : ""
+      className={`overflow-hidden transition-all duration-300 accent-stripe-left ${
+        completed ? "border-success/30 bg-success-muted/20" : ""
       } ${popping ? "animate-pop" : ""}`}
     >
-      {/* Header row — uses div instead of button to allow nested <a> for video link */}
       <div
         role="button"
         tabIndex={0}
@@ -139,7 +138,7 @@ export function ExerciseCard({
         onKeyDown={handleKeyDown}
         aria-expanded={expanded}
         aria-label={`${exercise.name} — ${targetSets} sets x ${targetReps}`}
-        className="flex w-full items-center justify-between px-4 py-3 text-left cursor-pointer"
+        className="flex w-full items-center justify-between pl-5 pr-4 py-3 text-left cursor-pointer"
       >
         <div className="flex-1">
           <div className="flex items-center gap-2">
@@ -148,13 +147,13 @@ export function ExerciseCard({
                 href={exercise.videoUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-semibold text-sm text-info underline decoration-info/40 underline-offset-2"
+                className="font-bold text-sm text-info underline decoration-info/30 underline-offset-2 hover:decoration-info/60 transition-colors"
                 onClick={(e) => e.stopPropagation()}
               >
                 {exercise.name}
               </a>
             ) : (
-              <h3 className="font-semibold text-sm">{exercise.name}</h3>
+              <h3 className="font-bold text-sm">{exercise.name}</h3>
             )}
             {slotType === "rotating" && (
               <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
@@ -167,13 +166,12 @@ export function ExerciseCard({
           </p>
         </div>
 
-        {/* Done indicator */}
         <div className="flex items-center gap-2">
           {completed && (
             <CheckCircle2 className="h-5 w-5 text-success" aria-hidden="true" />
           )}
           <ChevronDown
-            className={`h-4 w-4 text-muted-foreground transition-transform ${
+            className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${
               expanded ? "rotate-180" : ""
             }`}
             aria-hidden="true"
@@ -181,24 +179,22 @@ export function ExerciseCard({
         </div>
       </div>
 
-      {/* Expanded content */}
       {expanded && (
-        <CardContent className="space-y-3 px-4 pb-4 pt-0">
+        <CardContent className="space-y-3 pl-5 pr-4 pb-4 pt-0">
           <FormCueTip cues={exercise.formCues} />
 
           {suggestion && (
-            <div className="rounded-xl bg-info-muted px-3 py-2">
-              <p className="text-xs font-medium text-info">
+            <div className="rounded-xl bg-info-muted/60 px-3 py-2 border border-info/10">
+              <p className="text-xs font-semibold text-info">
                 {suggestion.label}
               </p>
             </div>
           )}
 
-          {/* Weight input + Done button */}
-          <div className="flex items-center gap-3 rounded-xl bg-muted/50 px-3 py-3">
+          <div className="flex items-center gap-3 rounded-2xl bg-muted/40 px-3 py-3">
             <div className="text-center">
-              <p className="text-[10px] font-medium text-muted-foreground mb-1">
-                WEIGHT (LBS)
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">
+                Weight (lbs)
               </p>
               <NumberInput
                 value={weight}
@@ -212,10 +208,10 @@ export function ExerciseCard({
 
             <button
               onClick={handleToggleComplete}
-              className={`rounded-xl px-6 py-4 text-sm font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+              className={`rounded-2xl px-6 py-4 text-sm font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
                 completed
-                  ? "bg-success text-success-foreground active:bg-success/90"
-                  : "bg-primary text-primary-foreground active:bg-primary/90"
+                  ? "btn-gradient-success"
+                  : "btn-gradient-primary"
               }`}
             >
               {completed ? "Done!" : "Complete"}

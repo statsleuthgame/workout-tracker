@@ -81,8 +81,8 @@ export default function WeightLogPage() {
 
       {/* Chart */}
       {chartData.length > 1 && (
-        <Card className="p-4">
-          <h2 className="mb-3 text-sm font-semibold">Weight Trend</h2>
+        <Card className="p-5">
+          <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Weight Trend</h2>
           <ResponsiveContainer width="100%" height={200}>
             <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />
@@ -112,8 +112,8 @@ export default function WeightLogPage() {
       )}
 
       {/* Log Input */}
-      <Card className="space-y-3 p-4">
-        <h2 className="text-sm font-semibold">Log Today&apos;s Weight</h2>
+      <Card className="space-y-3 p-5">
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Log Today&apos;s Weight</h2>
         <div className="flex gap-2">
           <input
             type="number"
@@ -121,12 +121,12 @@ export default function WeightLogPage() {
             value={weight}
             onChange={(e) => setWeight(e.target.value)}
             placeholder="Weight (lbs)"
-            className="flex-1 rounded-xl border border-border bg-background px-3 py-2.5 text-base outline-none placeholder:text-muted-foreground/60 focus:border-primary focus:ring-1 focus:ring-primary"
+            className="flex-1 rounded-2xl border border-border/50 bg-background/50 px-4 py-3 text-base outline-none placeholder:text-muted-foreground/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all"
           />
           <button
             onClick={handleLog}
             disabled={!weight}
-            className="rounded-xl bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 active:bg-primary/90"
+            className="rounded-2xl btn-gradient-primary px-6 py-3 text-sm font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50"
           >
             Log
           </button>
@@ -136,14 +136,14 @@ export default function WeightLogPage() {
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           placeholder="Notes (optional)"
-          className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm outline-none placeholder:text-muted-foreground/60 focus:border-primary focus:ring-1 focus:ring-primary"
+          className="w-full rounded-2xl border border-border/50 bg-background/50 px-4 py-3 text-sm outline-none placeholder:text-muted-foreground/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all"
         />
       </Card>
 
       {/* History */}
       {metrics && metrics.length > 0 && (
         <div className="space-y-2">
-          <h2 className="text-sm font-semibold">History</h2>
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">History</h2>
           {[...metrics].reverse().map((m) => (
             <Card
               key={m.id}

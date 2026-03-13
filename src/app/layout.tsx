@@ -50,7 +50,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <DbProvider>
-          <main className="mx-auto min-h-screen max-w-md pb-24">
+          <main className="mx-auto min-h-screen max-w-md pb-28">
             {children}
           </main>
           <BottomNav />
