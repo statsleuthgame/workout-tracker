@@ -35,14 +35,6 @@ export default function WeekPage() {
         <p className="text-sm text-muted-foreground">{program.phase}</p>
       </div>
 
-      {/* Phase Update Banner */}
-      <div className="rounded-xl bg-emerald-50 px-4 py-2.5">
-        <p className="text-sm font-medium text-emerald-800">
-          <span className="font-bold">Phase 4 Update:</span> One new exercise
-          added daily. Target weight loss: {program.weightLossTarget}.
-        </p>
-      </div>
-
       {/* Week Tabs */}
       <div className="flex gap-2">
         {Array.from({ length: program.weeks }, (_, i) => i + 1).map((week) => (
@@ -112,6 +104,7 @@ export default function WeekPage() {
                       viewBox="0 0 20 20"
                       fill="currentColor"
                       className="h-5 w-5 text-emerald-600"
+                      aria-hidden="true"
                     >
                       <path
                         fillRule="evenodd"
@@ -127,6 +120,7 @@ export default function WeekPage() {
                   viewBox="0 0 20 20"
                   fill="currentColor"
                   className="h-4 w-4 text-muted-foreground"
+                  aria-hidden="true"
                 >
                   <path
                     fillRule="evenodd"

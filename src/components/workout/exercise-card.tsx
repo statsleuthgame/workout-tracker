@@ -17,7 +17,6 @@ interface ExerciseCardProps {
   workoutLogId: string;
   targetSets: number;
   targetReps: string;
-  restSeconds: number;
   notes: string;
   slotType: "fixed" | "rotating";
   slotName: string;
@@ -29,7 +28,6 @@ export function ExerciseCard({
   workoutLogId,
   targetSets,
   targetReps,
-  restSeconds,
   notes,
   slotType,
   slotName,
@@ -109,6 +107,8 @@ export function ExerciseCard({
       {/* Header row — always visible */}
       <button
         onClick={() => setExpanded(!expanded)}
+        aria-expanded={expanded}
+        aria-label={`${exercise.name} — ${targetSets} sets x ${targetReps}`}
         className="flex w-full items-center justify-between px-4 py-3 text-left"
       >
         <div className="flex-1">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { ExerciseCard } from "@/components/workout/exercise-card";
 import { useTemplateForDay, useSetLogs, useProgram } from "@/lib/db/hooks";
@@ -10,9 +10,10 @@ import {
   getDayOfWeek,
   getDateString,
   getDayName,
+  getDateForDayInWeek,
 } from "@/lib/utils/dates";
 
-export default function TodayPage() {
+function TodayContent() {
   const searchParams = useSearchParams();
   const today = new Date();
 
@@ -22,11 +23,18 @@ export default function TodayPage() {
 
   const weekNumber = paramWeek ? parseInt(paramWeek) : getWeekNumber(today);
   const dayOfWeek = paramDay !== null ? parseInt(paramDay) : getDayOfWeek(today);
-  const dateStr = paramWeek ? `${weekNumber}-${dayOfWeek}` : getDateString(today);
+
+  // Use the correct date for the selected day (not always today)
+  const targetDate = paramWeek
+    ? getDateForDayInWeek(weekNumber, dayOfWeek)
+    : today;
+  const dateStr = getDateString(targetDate);
 
   const program = useProgram();
   const template = useTemplateForDay(weekNumber, dayOfWeek);
   const [workoutLogId, setWorkoutLogId] = useState<string | null>(null);
+  const [workoutNotes, setWorkoutNotes] = useState("");
+  const [isFinished, setIsFinished] = useState(false);
   const setLogs = useSetLogs(workoutLogId ?? undefined);
 
   // Create or find workout log
@@ -34,21 +42,24 @@ export default function TodayPage() {
     if (!template) return;
 
     (async () => {
-      // Use a unique ID based on the template to avoid conflicts
       const logId = `log-${template.id}`;
       const existing = await db.workoutLogs.get(logId);
 
       if (existing) {
         setWorkoutLogId(existing.id);
+        setWorkoutNotes(existing.notes || "");
+        setIsFinished(!!existing.completedAt);
       } else {
         await db.workoutLogs.put({
           id: logId,
           templateId: template.id,
-          date: getDateString(today),
+          date: dateStr,
           startedAt: new Date().toISOString(),
           notes: "",
         });
         setWorkoutLogId(logId);
+        setWorkoutNotes("");
+        setIsFinished(false);
       }
     })();
   }, [template, dateStr]);
@@ -58,6 +69,7 @@ export default function TodayPage() {
     await db.workoutLogs.update(workoutLogId, {
       completedAt: new Date().toISOString(),
     });
+    setIsFinished(true);
   }, [workoutLogId]);
 
   if (!template || !program) {
@@ -92,7 +104,14 @@ export default function TodayPage() {
             {completedCount}/{totalCount} exercises
           </span>
         </div>
-        <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+        <div
+          className="h-2 w-full overflow-hidden rounded-full bg-muted"
+          role="progressbar"
+          aria-valuenow={completedCount}
+          aria-valuemin={0}
+          aria-valuemax={totalCount}
+          aria-label={`${completedCount} of ${totalCount} exercises completed`}
+        >
           <div
             className="h-full rounded-full bg-emerald-500 transition-all duration-500"
             style={{
@@ -112,7 +131,6 @@ export default function TodayPage() {
               workoutLogId={workoutLogId}
               targetSets={ex.targetSets}
               targetReps={ex.targetReps}
-              restSeconds={ex.restSeconds}
               notes={ex.notes}
               slotType={ex.slotType}
               slotName={ex.slotName}
@@ -122,14 +140,23 @@ export default function TodayPage() {
         </div>
       )}
 
-      {/* Finish Button */}
-      {completedCount === totalCount && totalCount > 0 && (
-        <button
-          onClick={handleFinishWorkout}
-          className="w-full rounded-2xl bg-emerald-600 py-4 text-lg font-bold text-white shadow-lg transition-colors active:bg-emerald-700"
-        >
-          Finish Workout
-        </button>
+      {/* Finish Button / Completed State */}
+      {isFinished ? (
+        <div className="rounded-2xl bg-emerald-50 py-4 text-center">
+          <p className="text-lg font-bold text-emerald-700">
+            Workout Complete!
+          </p>
+        </div>
+      ) : (
+        completedCount === totalCount &&
+        totalCount > 0 && (
+          <button
+            onClick={handleFinishWorkout}
+            className="w-full rounded-2xl bg-emerald-600 py-4 text-lg font-bold text-white shadow-lg transition-colors active:bg-emerald-700"
+          >
+            Finish Workout
+          </button>
+        )
       )}
 
       {/* Daily Log */}
@@ -141,16 +168,32 @@ export default function TodayPage() {
           className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground/60 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
           placeholder="Notes on today's workout, energy levels..."
           rows={3}
+          value={workoutNotes}
           onChange={async (e) => {
+            const val = e.target.value;
+            setWorkoutNotes(val);
             if (workoutLogId) {
               await db.workoutLogs.update(workoutLogId, {
-                notes: e.target.value,
+                notes: val,
               });
             }
           }}
         />
       </div>
-
     </div>
+  );
+}
+
+export default function TodayPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex h-[60vh] items-center justify-center">
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      }
+    >
+      <TodayContent />
+    </Suspense>
   );
 }

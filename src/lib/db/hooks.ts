@@ -13,10 +13,6 @@ export function useExercise(id: string) {
   return useLiveQuery(() => db.exercises.get(id), [id]);
 }
 
-export function useExercises() {
-  return useLiveQuery(() => db.exercises.toArray());
-}
-
 export function useTemplateForDay(weekNumber: number, dayOfWeek: number) {
   return useLiveQuery(
     () =>
@@ -40,17 +36,6 @@ export function useTemplatesForWeek(weekNumber: number) {
   );
 }
 
-export function useWorkoutLog(date: string) {
-  return useLiveQuery(
-    () => db.workoutLogs.where("date").equals(date).first(),
-    [date]
-  );
-}
-
-export function useWorkoutLogById(id: string) {
-  return useLiveQuery(() => db.workoutLogs.get(id), [id]);
-}
-
 export function useSetLogs(workoutLogId: string | undefined) {
   return useLiveQuery(
     () =>
@@ -67,10 +52,6 @@ export function useBodyMetrics() {
 
 export function useWorkoutLogs() {
   return useLiveQuery(() => db.workoutLogs.orderBy("date").reverse().toArray());
-}
-
-export function useUserSettings() {
-  return useLiveQuery(() => db.userSettings.get("default"));
 }
 
 export function useCompletedWorkoutsForWeek(weekNumber: number) {
