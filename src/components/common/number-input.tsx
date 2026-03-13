@@ -26,7 +26,7 @@ export function NumberInput({
       <button
         type="button"
         onClick={() => onChange(Math.max(min, (value || 0) - step))}
-        className="flex h-12 w-12 items-center justify-center rounded-2xl bg-muted/60 text-lg font-bold text-muted-foreground transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        className="flex h-12 w-12 items-center justify-center rounded-2xl bg-muted hover:bg-accent text-lg font-bold text-muted-foreground transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         aria-label="Decrease"
       >
         -
@@ -42,12 +42,12 @@ export function NumberInput({
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         placeholder={placeholder}
-        className="h-12 w-20 rounded-2xl border border-border/50 bg-background/50 text-center text-lg font-bold outline-none placeholder:text-muted-foreground/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all"
+        className="h-12 w-20 rounded-2xl border border-border bg-background/50 text-center text-lg font-bold outline-none placeholder:text-muted-foreground/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all"
       />
       <button
         type="button"
         onClick={() => onChange((value || 0) + step)}
-        className="flex h-12 w-12 items-center justify-center rounded-2xl bg-muted/60 text-lg font-bold text-muted-foreground transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        className="flex h-12 w-12 items-center justify-center rounded-2xl bg-muted hover:bg-accent text-lg font-bold text-muted-foreground transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         aria-label="Increase"
       >
         +

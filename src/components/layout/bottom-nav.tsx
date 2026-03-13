@@ -42,7 +42,7 @@ export function BottomNav() {
                 <span className={`text-[11px] font-medium ${isActive ? "font-semibold" : ""}`}>
                   {item.label}
                 </span>
-                {isActive && <span className="nav-indicator" />}
+                {isActive && <span className="w-5 h-1 rounded-full bg-primary" />}
               </Link>
             );
           })}

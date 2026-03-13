@@ -13,7 +13,9 @@ import {
   getDateForDayInWeek,
 } from "@/lib/utils/dates";
 import { PageHeader } from "@/components/common/page-header";
-import { Check, ChevronRight } from "lucide-react";
+import { StatCard } from "@/components/common/stat-card";
+import { getThemeColor, getThemeLabel } from "@/lib/constants/theme-colors";
+import { Check, ChevronRight, Dumbbell } from "lucide-react";
 import Link from "next/link";
 
 export default function WeekPage() {
@@ -34,7 +36,7 @@ export default function WeekPage() {
           ))}
         </div>
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="h-16 animate-pulse rounded-xl bg-muted" />
+          <div key={i} className="h-20 animate-pulse rounded-xl bg-muted" />
         ))}
       </div>
     );
@@ -43,6 +45,13 @@ export default function WeekPage() {
   const completedTemplateIds = new Set(
     completedWorkouts?.map((w) => w.templateId) || []
   );
+
+  const totalDays = templates?.length || 0;
+  const completedDays = templates?.filter((t) => completedTemplateIds.has(t.id)).length || 0;
+  const totalSetsThisWeek = templates?.reduce(
+    (sum, t) => sum + t.exercises.reduce((s, ex) => s + ex.targetSets, 0),
+    0
+  ) || 0;
 
   return (
     <div className="space-y-4 px-4 pt-6">
@@ -65,6 +74,13 @@ export default function WeekPage() {
         ))}
       </div>
 
+      {/* Weekly Summary Stats */}
+      <div className="flex gap-3">
+        <StatCard label="Total Sets" value={totalSetsThisWeek} />
+        <StatCard label="Done" value={`${completedDays}/${totalDays}`} />
+        <StatCard label="Remaining" value={totalDays - completedDays} />
+      </div>
+
       {/* Day Cards */}
       <div className="space-y-2">
         {templates?.map((template) => {
@@ -73,6 +89,11 @@ export default function WeekPage() {
           const isCompleted = completedTemplateIds.has(template.id);
           const isToday =
             date.toDateString() === new Date().toDateString();
+          const themeColor = getThemeColor(template.dayTheme);
+          const themeLabel = getThemeLabel(template.dayTheme);
+          const totalSets = template.exercises.reduce((sum, ex) => sum + ex.targetSets, 0);
+          const exerciseNames = template.exercises.slice(0, 3).map((ex) => ex.slotName || "Exercise");
+          const extraCount = template.exercises.length - 3;
 
           return (
             <Link
@@ -80,46 +101,67 @@ export default function WeekPage() {
               href={`/today?week=${selectedWeek}&day=${template.dayOfWeek}`}
             >
               <Card
-                className={`flex items-center gap-4 px-4 py-3.5 transition-all hover:translate-x-0.5 ${
+                className={`flex items-center gap-3.5 px-4 py-3.5 transition-all hover:translate-x-0.5 border-l-[3px] ${themeColor.border} ${
                   isToday ? "glass-card-elevated" : ""
-                } ${isCompleted ? "bg-success-muted/20" : ""}`}
+                } ${isCompleted ? "bg-success-muted/30" : ""}`}
               >
                 <div
-                  className={`flex h-12 w-12 flex-col items-center justify-center rounded-xl font-bold ${
+                  className={`flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-xl font-bold ${
                     isToday
                       ? "btn-gradient-primary text-primary-foreground"
-                      : "bg-muted/60"
+                      : `${themeColor.bg}`
                   }`}
                 >
-                  <span className="text-[10px] leading-none tracking-wider">
+                  <span className={`text-[10px] leading-none tracking-wider ${isToday ? "" : themeColor.text}`}>
                     {getDayAbbrev(template.dayOfWeek)}
                   </span>
-                  <span className="text-lg leading-tight">
+                  <span className={`text-lg leading-tight ${isToday ? "" : themeColor.text}`}>
                     {dayNum}
                   </span>
                 </div>
 
-                <div className="flex-1">
-                  <h3 className="font-bold text-sm">
-                    {template.dayLabel}
-                  </h3>
-                  <p className="text-xs text-muted-foreground">
-                    {template.exercises.length} Exercises
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-bold text-sm">
+                      {template.dayLabel}
+                    </h3>
+                    {isCompleted && (
+                      <div className="flex h-5 w-5 items-center justify-center rounded-full bg-success/15">
+                        <Check className="h-3 w-3 text-success" aria-hidden="true" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <span className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full ${themeColor.bg} ${themeColor.text}`}>
+                      {themeLabel}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground">
+                      · {totalSets} sets
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground mt-1 truncate">
+                    {exerciseNames.join(", ")}
+                    {extraCount > 0 && ` +${extraCount} more`}
                   </p>
                 </div>
 
-                {isCompleted && (
-                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-success/15">
-                    <Check className="h-4 w-4 text-success" aria-hidden="true" />
-                  </div>
-                )}
-
-                <ChevronRight className={`h-4 w-4 transition-colors ${isToday ? "text-primary" : "text-muted-foreground"}`} aria-hidden="true" />
+                <ChevronRight className={`h-4 w-4 shrink-0 transition-colors ${isToday ? "text-primary" : "text-muted-foreground"}`} aria-hidden="true" />
               </Card>
             </Link>
           );
         })}
       </div>
+
+      {/* Empty State */}
+      {(!templates || templates.length === 0) && (
+        <Card className="px-4 py-10 text-center">
+          <Dumbbell className="mx-auto h-16 w-16 text-muted-foreground/20" />
+          <p className="mt-3 text-xl font-extrabold gradient-text">No workouts this week</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Check another week or set up your program.
+          </p>
+        </Card>
+      )}
     </div>
   );
 }

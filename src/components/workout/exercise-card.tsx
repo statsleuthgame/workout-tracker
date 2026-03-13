@@ -12,6 +12,7 @@ import {
   type ProgressionSuggestion,
 } from "@/lib/progression/engine";
 import { CheckCircle2, ChevronDown } from "lucide-react";
+import { getThemeColor } from "@/lib/constants/theme-colors";
 
 interface ExerciseCardProps {
   exerciseId: string;
@@ -22,6 +23,7 @@ interface ExerciseCardProps {
   slotType: "fixed" | "rotating";
   slotName: string;
   existingSets: SetLog[];
+  dayTheme?: string;
 }
 
 export function ExerciseCard({
@@ -33,6 +35,7 @@ export function ExerciseCard({
   slotType,
   slotName,
   existingSets,
+  dayTheme,
 }: ExerciseCardProps) {
   const exercise = useExercise(exerciseId);
   const [expanded, setExpanded] = useState(false);
@@ -127,8 +130,8 @@ export function ExerciseCard({
 
   return (
     <Card
-      className={`overflow-hidden transition-all duration-300 accent-stripe-left ${
-        completed ? "border-success/30 bg-success-muted/20" : ""
+      className={`overflow-hidden transition-all duration-300 border-l-[3px] ${dayTheme ? getThemeColor(dayTheme).border : "border-l-primary"} ${
+        completed ? "border-success/30 bg-success-muted/30" : ""
       } ${popping ? "animate-pop" : ""}`}
     >
       <div

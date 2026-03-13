@@ -49,6 +49,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none" aria-hidden="true">
+          <div className="absolute -top-1/3 -right-1/4 h-[600px] w-[600px] rounded-full bg-primary/10 blur-[120px]" />
+          <div className="absolute top-1/2 -left-1/3 h-[500px] w-[500px] rounded-full bg-info/8 blur-[100px]" />
+        </div>
         <DbProvider>
           <main className="mx-auto min-h-screen max-w-md pb-28">
             {children}

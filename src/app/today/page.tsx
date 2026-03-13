@@ -173,6 +173,7 @@ function TodayContent() {
               slotType={ex.slotType}
               slotName={ex.slotName}
               existingSets={setLogs || []}
+              dayTheme={template.dayTheme}
             />
           ))}
         </div>
@@ -210,7 +211,7 @@ function TodayContent() {
         </label>
         <textarea
           id="daily-log"
-          className="mt-1.5 w-full rounded-2xl border border-border/50 bg-card/50 backdrop-blur px-4 py-3 text-sm placeholder:text-muted-foreground/50 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+          className="mt-1.5 w-full rounded-2xl border border-border bg-card/50 backdrop-blur px-4 py-3 text-sm placeholder:text-muted-foreground/50 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
           placeholder={
             [
               "How are you feeling today?",

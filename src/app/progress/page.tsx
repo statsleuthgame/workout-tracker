@@ -8,6 +8,7 @@ import { formatDate } from "@/lib/utils/dates";
 import { PageHeader } from "@/components/common/page-header";
 import { StatCard } from "@/components/common/stat-card";
 import { CHART_COLORS } from "@/lib/constants/chart-colors";
+import { TrendingUp as TrendingUpIcon } from "lucide-react";
 import {
   LineChart,
   Line,
@@ -205,7 +206,8 @@ export default function ProgressPage() {
       {/* Empty State */}
       {completedWorkouts.length === 0 && (
         <Card className="px-4 py-10 text-center">
-          <p className="text-xl font-extrabold gradient-text">The best graphs start somewhere</p>
+          <TrendingUpIcon className="mx-auto h-16 w-16 text-muted-foreground/20" />
+          <p className="mt-3 text-xl font-extrabold gradient-text">The best graphs start somewhere</p>
           <p className="mt-1 text-sm text-muted-foreground">
             Complete a workout and watch the data roll in.
           </p>

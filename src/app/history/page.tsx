@@ -7,6 +7,7 @@ import { db } from "@/lib/db/database";
 import { formatDate } from "@/lib/utils/dates";
 import { useLiveQuery } from "dexie-react-hooks";
 import { PageHeader } from "@/components/common/page-header";
+import { History } from "lucide-react";
 
 export default function HistoryPage() {
   const workoutLogs = useWorkoutLogs();
@@ -99,7 +100,8 @@ export default function HistoryPage() {
         </div>
       ) : (
         <Card className="px-4 py-10 text-center">
-          <p className="text-xl font-extrabold gradient-text">Your story starts today</p>
+          <History className="mx-auto h-16 w-16 text-muted-foreground/20" />
+          <p className="mt-3 text-xl font-extrabold gradient-text">Your story starts today</p>
           <p className="mt-1 text-sm text-muted-foreground">
             Every rep, every set, every workout — it all adds up.
           </p>
