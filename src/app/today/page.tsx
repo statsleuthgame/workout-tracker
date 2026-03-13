@@ -3,7 +3,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { ExerciseCard } from "@/components/workout/exercise-card";
-import { RestTimer } from "@/components/workout/rest-timer";
 import { useTemplateForDay, useSetLogs, useProgram } from "@/lib/db/hooks";
 import { db } from "@/lib/db/database";
 import {
@@ -69,11 +68,10 @@ export default function TodayPage() {
     );
   }
 
-  const completedSets = setLogs?.filter((s) => s.completed).length || 0;
-  const totalSets = template.exercises.reduce(
-    (sum, e) => sum + e.targetSets,
-    0
-  );
+  // Count completed exercises (1 record per exercise in simplified model)
+  const completedCount =
+    setLogs?.filter((s) => s.completed).length || 0;
+  const totalCount = template.exercises.length;
 
   return (
     <div className="space-y-4 px-4 pt-6">
@@ -91,14 +89,14 @@ export default function TodayPage() {
         <div className="flex justify-between text-xs text-muted-foreground">
           <span>Progress</span>
           <span>
-            {completedSets}/{totalSets} sets
+            {completedCount}/{totalCount} exercises
           </span>
         </div>
         <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
           <div
             className="h-full rounded-full bg-emerald-500 transition-all duration-500"
             style={{
-              width: `${totalSets > 0 ? (completedSets / totalSets) * 100 : 0}%`,
+              width: `${totalCount > 0 ? (completedCount / totalCount) * 100 : 0}%`,
             }}
           />
         </div>
@@ -125,7 +123,7 @@ export default function TodayPage() {
       )}
 
       {/* Finish Button */}
-      {completedSets === totalSets && totalSets > 0 && (
+      {completedCount === totalCount && totalCount > 0 && (
         <button
           onClick={handleFinishWorkout}
           className="w-full rounded-2xl bg-emerald-600 py-4 text-lg font-bold text-white shadow-lg transition-colors active:bg-emerald-700"
@@ -153,8 +151,6 @@ export default function TodayPage() {
         />
       </div>
 
-      {/* Rest Timer Overlay */}
-      <RestTimer />
     </div>
   );
 }

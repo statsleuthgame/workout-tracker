@@ -32,6 +32,8 @@ export const exerciseLibrary: Exercise[] = [
 
   // ===== SHOULDERS =====
   { id: "db-overhead-press", name: "Seated DB Overhead Press", muscleGroup: "shoulders", equipment: "dumbbell", formCues: ["Core tight, neutral spine", "Press slightly in front", "Full lockout"], videoUrl: yt("seated dumbbell overhead press") },
+  { id: "arnold-press", name: "Arnold Press", muscleGroup: "shoulders", equipment: "dumbbell", formCues: ["Rotate palms as you press", "Full range of motion", "Control the descent"], videoUrl: yt("arnold press") },
+  { id: "front-raise", name: "Front Raises", muscleGroup: "shoulders", equipment: "dumbbell", formCues: ["Raise to eye level", "Slight bend in elbows", "Control the negative"], videoUrl: yt("front raises dumbbell") },
   { id: "lateral-raise", name: "Lateral Raises", muscleGroup: "shoulders", equipment: "dumbbell", formCues: ["Lead with elbows", "Slight forward lean", "Stop at shoulder height"], videoUrl: yt("lateral raises dumbbell") },
   { id: "cable-lateral-raise", name: "Cable Lateral Raises", muscleGroup: "shoulders", equipment: "cable", formCues: ["Lead with elbow", "Constant tension", "Control the negative"], videoUrl: yt("cable lateral raise") },
   { id: "machine-press", name: "Machine Shoulder Press", muscleGroup: "shoulders", equipment: "machine", formCues: ["Feet flat", "Press through full range", "Control descent"], videoUrl: yt("machine shoulder press") },
@@ -58,11 +60,16 @@ export const exerciseLibrary: Exercise[] = [
   { id: "wrist-curl", name: "Forearm Wrist Curls", muscleGroup: "forearms", equipment: "dumbbell", formCues: ["Burnout", "Rest forearms on thighs", "Full range"], videoUrl: yt("wrist curls") },
 
   // ===== CHEST =====
+  { id: "flat-bench", name: "Flat Barbell Bench Press", muscleGroup: "chest", equipment: "barbell", formCues: ["Arch back slightly", "Feet flat on floor", "Touch chest, press up"], videoUrl: yt("flat barbell bench press") },
   { id: "incline-db-press", name: "Incline DB Press", muscleGroup: "chest", equipment: "dumbbell", formCues: ["30-45 degree angle", "Squeeze at top", "Full stretch at bottom"], videoUrl: yt("incline dumbbell press") },
   { id: "cable-fly", name: "Cable Flys", muscleGroup: "chest", equipment: "cable", formCues: ["Slight bend in elbows", "Squeeze at center", "Control the stretch"], videoUrl: yt("cable flys") },
+  { id: "chest-press-machine", name: "Chest Press Machine", muscleGroup: "chest", equipment: "machine", formCues: ["Chest up, shoulders back", "Full range of motion", "Control the negative"], videoUrl: yt("chest press machine") },
 
   // ===== LEGS =====
+  { id: "deadlift", name: "Conventional Deadlift", muscleGroup: "back", equipment: "barbell", formCues: ["Hips back, chest up", "Drive through heels", "Lock out hips at top"], videoUrl: yt("conventional deadlift") },
+  { id: "rack-pull", name: "Rack Pulls", muscleGroup: "back", equipment: "barbell", formCues: ["Bar at knee height", "Drive hips forward", "Squeeze back at top"], videoUrl: yt("rack pulls") },
   { id: "back-squat", name: "Back Squat", muscleGroup: "quads", equipment: "barbell", formCues: ["Full depth", "Knees over toes", "Brace core"], videoUrl: yt("barbell back squat") },
+  { id: "goblet-squat", name: "Goblet Squats", muscleGroup: "quads", equipment: "dumbbell", formCues: ["Hold dumbbell at chest", "Elbows inside knees", "Full depth"], videoUrl: yt("goblet squat") },
   { id: "hack-squat", name: "Hack Squat", muscleGroup: "quads", equipment: "machine", formCues: ["Full depth", "Feet shoulder width", "Control descent"], videoUrl: yt("hack squat machine") },
   { id: "rdl", name: "Romanian Deadlifts", muscleGroup: "hamstrings", equipment: "barbell", formCues: ["Hinge at hips", "Slight knee bend", "Feel hamstring stretch"], videoUrl: yt("romanian deadlift") },
   { id: "lying-leg-curl", name: "Lying Leg Curls", muscleGroup: "hamstrings", equipment: "machine", formCues: ["Control eccentric", "Point toes", "Full range"], videoUrl: yt("lying leg curl") },
@@ -71,9 +78,13 @@ export const exerciseLibrary: Exercise[] = [
   { id: "leg-press", name: "Leg Press", muscleGroup: "quads", equipment: "machine", formCues: ["Feet high for glutes", "Full range", "Don't lock knees"], videoUrl: yt("leg press") },
   { id: "bulgarian-split", name: "Bulgarian Split Squat", muscleGroup: "quads", equipment: "dumbbell", formCues: ["Back foot on bench", "Torso upright", "Drive through front heel"], videoUrl: yt("bulgarian split squat") },
   { id: "hip-thrust", name: "Hip Thrust", muscleGroup: "glutes", equipment: "barbell", formCues: ["Squeeze glutes at top", "Chin tucked", "Pause at top"], videoUrl: yt("barbell hip thrust") },
+  { id: "glute-bridge", name: "Glute Bridges", muscleGroup: "glutes", equipment: "dumbbell", formCues: ["Drive through heels", "Squeeze glutes at top", "Pause at top"], videoUrl: yt("glute bridge") },
   { id: "walking-lunge", name: "Walking Lunges", muscleGroup: "quads", equipment: "dumbbell", formCues: ["Long stride", "Knee tracks over toe", "Upright torso"], videoUrl: yt("walking lunges") },
 
   // ===== CORE =====
+  { id: "russian-twist", name: "Russian Twists", muscleGroup: "core", equipment: "dumbbell", formCues: ["Lean back 45 degrees", "Rotate fully side to side", "Feet off ground"], videoUrl: yt("russian twists") },
+  { id: "hollow-body-hold", name: "Hollow Body Holds", muscleGroup: "core", equipment: "bodyweight", formCues: ["Lower back pressed to floor", "Arms overhead", "Legs straight"], videoUrl: yt("hollow body hold") },
+  { id: "captains-chair", name: "Captain's Chair Leg Raises", muscleGroup: "core", equipment: "machine", formCues: ["Curl pelvis up", "Control the descent", "No swinging"], videoUrl: yt("captains chair leg raises") },
   { id: "hanging-leg-raise", name: "Hanging Leg Raises", muscleGroup: "core", equipment: "pullup bar", formCues: ["Control the eccentric", "No swinging", "Curl pelvis up"], videoUrl: yt("hanging leg raises") },
   { id: "cable-crunch", name: "Cable Crunches", muscleGroup: "core", equipment: "cable", formCues: ["Round the back, squeeze core", "Hinge at hips", "Control the weight"], videoUrl: yt("cable crunches") },
   { id: "plank", name: "Plank", muscleGroup: "core", equipment: "bodyweight", formCues: ["Squeeze everything tight", "Flat back", "Breathe steadily"], videoUrl: yt("plank exercise") },
