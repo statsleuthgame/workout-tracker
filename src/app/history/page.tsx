@@ -53,13 +53,13 @@ export default function HistoryPage() {
       />
 
       {enrichedLogs && enrichedLogs.length > 0 ? (
-        <div className="space-y-2">
+        <div className="space-y-2 stagger-children">
           {enrichedLogs.map((log) => {
             const counts = setCounts?.get(log.id);
             const isCompleted = !!log.completedAt;
 
             return (
-              <Card key={log.id} className="px-4 py-3.5">
+              <Card key={log.id} className="px-4 py-3.5 card-hover">
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="flex items-center gap-2">
@@ -76,21 +76,21 @@ export default function HistoryPage() {
                         </Badge>
                       )}
                     </div>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-muted-foreground mt-0.5">
                       {formatDate(log.date)}
                       {log.template && ` · Week ${log.template.weekNumber}`}
                     </p>
                   </div>
                   <div className="text-right">
                     {counts && counts.total > 0 && (
-                      <p className="text-sm font-medium">
+                      <p className="text-sm font-medium tabular-nums">
                         {counts.completed}/{counts.total} sets
                       </p>
                     )}
                   </div>
                 </div>
                 {log.notes && (
-                  <p className="mt-1.5 text-xs text-muted-foreground italic">
+                  <p className="mt-2 text-xs text-muted-foreground italic">
                     &quot;{log.notes}&quot;
                   </p>
                 )}
@@ -99,10 +99,10 @@ export default function HistoryPage() {
           })}
         </div>
       ) : (
-        <Card className="px-4 py-10 text-center">
-          <History className="mx-auto h-16 w-16 text-muted-foreground/20" />
-          <p className="mt-3 text-xl font-extrabold gradient-text">Your story starts today</p>
-          <p className="mt-1 text-sm text-muted-foreground">
+        <Card className="px-4 py-14 text-center animate-slide-up">
+          <History className="mx-auto h-16 w-16 text-muted-foreground/15 animate-milestone" />
+          <p className="mt-4 text-xl font-extrabold gradient-text">Your story starts today</p>
+          <p className="mt-2 text-sm text-muted-foreground max-w-[260px] mx-auto">
             Every rep, every set, every workout — it all adds up.
           </p>
         </Card>

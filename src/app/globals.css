@@ -318,6 +318,57 @@
   100% { transform: scale(1); opacity: 1; }
 }
 
+/* Breathing glow for active elements */
+@keyframes breathing-glow {
+  0%, 100% { box-shadow: 0 0 8px 0 oklch(0.50 0.18 155 / 15%); }
+  50% { box-shadow: 0 0 20px 4px oklch(0.50 0.18 155 / 30%); }
+}
+
+/* Floating animation for background blobs */
+@keyframes float-slow {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -20px) scale(1.05); }
+  66% { transform: translate(-20px, 15px) scale(0.95); }
+}
+
+@keyframes float-slow-reverse {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(-25px, 20px) scale(0.95); }
+  66% { transform: translate(15px, -25px) scale(1.05); }
+}
+
+/* Staggered list entrance */
+@keyframes stagger-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Milestone pop (elastic) */
+@keyframes milestone-pop {
+  0% { transform: scale(0); opacity: 0; }
+  60% { transform: scale(1.15); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Gradient border shimmer */
+@keyframes border-shimmer {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Input focus flash */
+@keyframes input-flash {
+  0% { box-shadow: 0 0 0 3px oklch(0.50 0.18 155 / 40%); }
+  100% { box-shadow: 0 0 0 0 oklch(0.50 0.18 155 / 0%); }
+}
+
 .animate-pop {
   animation: pop 0.3s ease-out;
 }
@@ -332,6 +383,120 @@
 
 .animate-pulse-glow {
   animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-breathing-glow {
+  animation: breathing-glow 3s ease-in-out infinite;
+}
+
+.animate-milestone {
+  animation: milestone-pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* Staggered children animation */
+.stagger-children > * {
+  opacity: 0;
+  animation: stagger-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.stagger-children > *:nth-child(1) { animation-delay: 0.03s; }
+.stagger-children > *:nth-child(2) { animation-delay: 0.06s; }
+.stagger-children > *:nth-child(3) { animation-delay: 0.09s; }
+.stagger-children > *:nth-child(4) { animation-delay: 0.12s; }
+.stagger-children > *:nth-child(5) { animation-delay: 0.15s; }
+.stagger-children > *:nth-child(6) { animation-delay: 0.18s; }
+.stagger-children > *:nth-child(7) { animation-delay: 0.21s; }
+.stagger-children > *:nth-child(8) { animation-delay: 0.24s; }
+.stagger-children > *:nth-child(9) { animation-delay: 0.27s; }
+.stagger-children > *:nth-child(10) { animation-delay: 0.30s; }
+
+/* Floating background blobs */
+.blob-float {
+  animation: float-slow 20s ease-in-out infinite;
+}
+.blob-float-reverse {
+  animation: float-slow-reverse 25s ease-in-out infinite;
+}
+
+/* Card hover lift */
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--glass-shadow-lg);
+}
+.card-hover:active {
+  transform: translateY(0);
+}
+
+/* Enhanced input focus */
+.input-glow {
+  transition: all 0.3s ease;
+}
+.input-glow:focus {
+  border-color: oklch(0.50 0.18 155 / 50%);
+  box-shadow: 0 0 0 3px oklch(0.50 0.18 155 / 15%);
+}
+.dark .input-glow:focus {
+  border-color: oklch(0.68 0.20 155 / 50%);
+  box-shadow: 0 0 0 3px oklch(0.68 0.20 155 / 15%);
+}
+
+/* Gradient border effect for stat cards */
+.gradient-border {
+  position: relative;
+}
+.gradient-border::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  border-radius: 9999px 9999px 0 0;
+  background: linear-gradient(90deg, oklch(0.50 0.18 155), oklch(0.52 0.20 200), oklch(0.55 0.19 155));
+  background-size: 200% 100%;
+  animation: border-shimmer 4s ease-in-out infinite;
+}
+
+/* Nav active glow */
+.nav-glow-dot {
+  position: relative;
+}
+.nav-glow-dot::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 3px;
+  border-radius: 9999px;
+  background: var(--gradient-primary);
+  box-shadow: 0 0 8px oklch(0.50 0.18 155 / 40%);
+}
+
+/* Progress bar glow */
+.progress-glow {
+  box-shadow: 0 0 8px oklch(0.50 0.18 155 / 20%), 0 0 20px oklch(0.52 0.2 260 / 10%);
+}
+
+/* Celebration card */
+.celebration-card {
+  background: linear-gradient(135deg, var(--glass-bg), oklch(0.50 0.18 155 / 8%));
+  position: relative;
+  overflow: hidden;
+}
+.celebration-card::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, oklch(0.50 0.18 155 / 6%) 0%, transparent 60%);
+  animation: float-slow 15s ease-in-out infinite;
+  pointer-events: none;
 }
 
 .loading-dot {
@@ -351,6 +516,13 @@
     transition-duration: 0.01ms !important;
   }
   .progress-shimmer::after {
+    animation: none;
+  }
+  .stagger-children > * {
+    opacity: 1;
+    animation: none;
+  }
+  .blob-float, .blob-float-reverse {
     animation: none;
   }
 }

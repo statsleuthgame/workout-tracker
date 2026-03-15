@@ -81,8 +81,8 @@ export default function WeightLogPage() {
 
       {/* Chart */}
       {chartData.length > 1 && (
-        <Card className="p-5">
-          <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Weight Trend</h2>
+        <Card className="p-5 animate-slide-up">
+          <h2 className="mb-3 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Weight Trend</h2>
           <ResponsiveContainer width="100%" height={200}>
             <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />
@@ -113,7 +113,7 @@ export default function WeightLogPage() {
 
       {/* Log Input */}
       <Card className="space-y-3 p-5">
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Log Today&apos;s Weight</h2>
+        <h2 className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Log Today&apos;s Weight</h2>
         <div className="flex gap-2">
           <input
             type="number"
@@ -121,12 +121,12 @@ export default function WeightLogPage() {
             value={weight}
             onChange={(e) => setWeight(e.target.value)}
             placeholder="Weight (lbs)"
-            className="flex-1 rounded-2xl border border-border/50 bg-background/50 px-4 py-3 text-base outline-none placeholder:text-muted-foreground/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all"
+            className="flex-1 rounded-2xl border border-border/50 bg-background/50 px-4 py-3 text-base outline-none placeholder:text-muted-foreground/50 input-glow"
           />
           <button
             onClick={handleLog}
             disabled={!weight}
-            className="rounded-2xl btn-gradient-primary px-6 py-3 text-sm font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50"
+            className="rounded-2xl btn-gradient-primary px-6 py-3 text-sm font-bold active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50"
           >
             Log
           </button>
@@ -136,28 +136,30 @@ export default function WeightLogPage() {
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           placeholder="Notes (optional)"
-          className="w-full rounded-2xl border border-border/50 bg-background/50 px-4 py-3 text-sm outline-none placeholder:text-muted-foreground/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all"
+          className="w-full rounded-2xl border border-border/50 bg-background/50 px-4 py-3 text-sm outline-none placeholder:text-muted-foreground/50 input-glow"
         />
       </Card>
 
       {/* History */}
       {metrics && metrics.length > 0 && (
         <div className="space-y-2">
-          <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">History</h2>
-          {[...metrics].reverse().map((m) => (
-            <Card
-              key={m.id}
-              className="flex items-center justify-between px-4 py-3"
-            >
-              <div>
-                <p className="text-sm font-medium">{formatDate(m.date)}</p>
-                {m.notes && (
-                  <p className="text-xs text-muted-foreground">{m.notes}</p>
-                )}
-              </div>
-              <p className="text-lg font-bold">{m.weight} lbs</p>
-            </Card>
-          ))}
+          <h2 className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">History</h2>
+          <div className="space-y-2 stagger-children">
+            {[...metrics].reverse().map((m) => (
+              <Card
+                key={m.id}
+                className="flex items-center justify-between px-4 py-3.5 card-hover"
+              >
+                <div>
+                  <p className="text-sm font-medium">{formatDate(m.date)}</p>
+                  {m.notes && (
+                    <p className="text-xs text-muted-foreground">{m.notes}</p>
+                  )}
+                </div>
+                <p className="text-lg font-bold tabular-nums">{m.weight} <span className="text-xs text-muted-foreground font-medium">lbs</span></p>
+              </Card>
+            ))}
+          </div>
         </div>
       )}
     </div>

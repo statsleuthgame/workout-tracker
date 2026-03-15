@@ -20,7 +20,7 @@ export function BottomNav() {
       className="fixed bottom-0 left-0 right-0 z-50 pb-[env(safe-area-inset-bottom)]"
     >
       <div className="mx-auto max-w-md px-3 pb-2">
-        <div className="glass-card-elevated flex justify-around rounded-2xl">
+        <div className="glass-card-elevated flex justify-around rounded-2xl px-1">
           {navItems.map((item) => {
             const isActive = pathname.startsWith(item.href);
             return (
@@ -28,21 +28,24 @@ export function BottomNav() {
                 key={item.href}
                 href={item.href}
                 aria-current={isActive ? "page" : undefined}
-                className={`flex flex-1 flex-col items-center gap-1 py-3 text-xs transition-all ${
+                className={`relative flex flex-1 flex-col items-center gap-1 py-3 text-xs transition-all duration-200 ${
                   isActive
                     ? "text-primary"
-                    : "text-muted-foreground hover:text-foreground"
+                    : "text-muted-foreground hover:text-foreground active:scale-95"
                 }`}
               >
-                <item.Icon
-                  className={`h-5 w-5 transition-all duration-200 ${
-                    isActive ? "scale-110" : ""
-                  }`}
-                />
+                <div className={`relative transition-all duration-300 ${isActive ? "scale-110" : ""}`}>
+                  <item.Icon className="h-5 w-5" />
+                  {isActive && (
+                    <div className="absolute -inset-2 rounded-full bg-primary/10 -z-10 animate-breathing-glow" />
+                  )}
+                </div>
                 <span className={`text-[11px] font-medium ${isActive ? "font-semibold" : ""}`}>
                   {item.label}
                 </span>
-                {isActive && <span className="w-5 h-1 rounded-full bg-primary" />}
+                {isActive && (
+                  <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-8 h-[3px] rounded-full nav-glow-dot" style={{ background: "var(--gradient-primary)" }} />
+                )}
               </Link>
             );
           })}

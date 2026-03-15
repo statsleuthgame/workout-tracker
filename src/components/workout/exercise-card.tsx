@@ -168,7 +168,7 @@ export function ExerciseCard({
   return (
     <Card
       className={`overflow-hidden transition-all duration-300 border-l-[3px] ${dayTheme ? getThemeColor(dayTheme).border : "border-l-primary"} ${
-        completed ? "border-success/30 bg-success-muted/30" : ""
+        completed ? "border-success/30 bg-success-muted/30" : "card-hover"
       } ${popping ? "animate-pop" : ""}`}
     >
       <div
@@ -178,7 +178,7 @@ export function ExerciseCard({
         onKeyDown={handleKeyDown}
         aria-expanded={expanded}
         aria-label={`${exercise.name} — ${targetSets} sets x ${targetReps}`}
-        className="flex w-full items-center justify-between pl-5 pr-4 py-3 text-left cursor-pointer"
+        className="flex w-full items-center justify-between pl-5 pr-4 py-3.5 text-left cursor-pointer"
       >
         <div className="flex-1">
           <div className="flex items-center gap-2">
@@ -220,21 +220,21 @@ export function ExerciseCard({
       </div>
 
       {expanded && (
-        <CardContent className="space-y-3 pl-5 pr-4 pb-4 pt-0">
+        <CardContent className="space-y-3 pl-5 pr-4 pb-4 pt-0 animate-slide-up">
           <FormCueTip cues={exercise.formCues} />
 
           {!isCardio && suggestion && (
-            <div className="rounded-xl bg-info-muted/60 px-3 py-2 border border-info/10">
+            <div className="rounded-xl bg-info-muted/60 px-3 py-2.5 border border-info/10">
               <p className="text-xs font-semibold text-info">
                 {suggestion.label}
               </p>
             </div>
           )}
 
-          <div className="flex items-center gap-3 rounded-2xl bg-muted/40 px-3 py-3">
+          <div className="flex items-center gap-3 rounded-2xl bg-muted/40 px-4 py-3.5">
             {!isCardio && (
               <div className="text-center">
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">
+                <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">
                   Weight (lbs)
                 </p>
                 <NumberInput
@@ -256,7 +256,7 @@ export function ExerciseCard({
 
             <button
               onClick={handleToggleComplete}
-              className={`rounded-2xl px-6 py-4 text-sm font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+              className={`rounded-2xl px-6 py-4 text-sm font-bold transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
                 completed
                   ? "btn-gradient-success"
                   : "btn-gradient-primary"

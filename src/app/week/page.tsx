@@ -83,7 +83,7 @@ export default function WeekPage() {
       </div>
 
       {/* Day Cards — rotate so today is first when viewing current week */}
-      <div className="space-y-2">
+      <div className="space-y-2 stagger-children">
         {(selectedWeek === currentWeek && templates
           ? [...templates].sort((a, b) => {
               const today = new Date().getDay();
@@ -105,14 +105,14 @@ export default function WeekPage() {
 
           const cardContent = (
             <Card
-              className={`flex items-center gap-3.5 px-4 py-3.5 transition-all ${isRestDay ? "opacity-60" : "hover:translate-x-0.5"} border-l-[3px] ${themeColor.border} ${
-                isToday ? "glass-card-elevated" : ""
+              className={`flex items-center gap-3.5 px-4 py-3.5 transition-all duration-200 ${isRestDay ? "opacity-50" : "card-hover"} border-l-[3px] ${themeColor.border} ${
+                isToday ? "glass-card-elevated animate-breathing-glow" : ""
               } ${isCompleted ? "bg-success-muted/30" : ""}`}
             >
               <div
-                className={`flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-xl font-bold ${
+                className={`flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-xl font-bold transition-transform duration-200 ${
                   isToday
-                    ? "btn-gradient-primary text-primary-foreground"
+                    ? "btn-gradient-primary text-primary-foreground shadow-lg"
                     : `${themeColor.bg}`
                 }`}
               >

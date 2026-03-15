@@ -122,10 +122,10 @@ function TodayContent() {
           title="Rest Day"
           subtitle={`${getDayName(dayOfWeek)} · Week ${weekNumber} of ${program.weeks}`}
         />
-        <div className="flex flex-col items-center justify-center py-16 text-center">
-          <div className="mb-4 text-5xl">&#9749;</div>
-          <p className="text-xl font-extrabold gradient-text">No workout today</p>
-          <p className="mt-2 text-sm text-muted-foreground">
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <div className="mb-5 text-6xl animate-milestone">&#9749;</div>
+          <p className="text-2xl font-extrabold gradient-text">No workout today</p>
+          <p className="mt-3 text-sm text-muted-foreground max-w-[240px]">
             Rest, recover, and come back stronger tomorrow.
           </p>
         </div>
@@ -148,15 +148,15 @@ function TodayContent() {
       />
 
       {/* Progress bar */}
-      <div className="space-y-1.5">
+      <div className="space-y-1.5 animate-slide-up">
         <div className="flex justify-between text-xs font-medium text-muted-foreground">
           <span>{getProgressLabel(completedCount, totalCount)}</span>
-          <span>
+          <span className="tabular-nums">
             {completedCount}/{totalCount} exercises
           </span>
         </div>
         <div
-          className="h-3.5 w-full overflow-hidden rounded-full bg-muted/60"
+          className={`h-3.5 w-full overflow-hidden rounded-full bg-muted/60 ${progressPct > 0 ? "progress-glow" : ""}`}
           role="progressbar"
           aria-valuenow={completedCount}
           aria-valuemin={0}
@@ -180,7 +180,7 @@ function TodayContent() {
 
       {/* Exercise Cards */}
       {workoutLogId && (
-        <div className="space-y-3">
+        <div className="space-y-3 stagger-children">
           {template.exercises.map((ex) => (
             <ExerciseCard
               key={`${ex.exerciseId}-${ex.order}`}
@@ -200,11 +200,11 @@ function TodayContent() {
 
       {/* Finish Button / Completed State */}
       {isFinished ? (
-        <div className="animate-confetti glass-card-elevated rounded-2xl py-8 text-center">
-          <p className="text-3xl font-extrabold gradient-text">
+        <div className="celebration-card rounded-2xl py-10 text-center backdrop-blur-xl border border-success/20">
+          <p className="relative z-10 text-3xl font-extrabold gradient-text animate-milestone">
             Workout Complete
           </p>
-          <p className="mt-2 text-sm text-muted-foreground italic">
+          <p className="relative z-10 mt-3 text-sm text-muted-foreground italic">
             {celebrationPhrase}
           </p>
         </div>
@@ -213,7 +213,7 @@ function TodayContent() {
         totalCount > 0 && (
           <button
             onClick={handleFinishWorkout}
-            className="w-full rounded-2xl btn-gradient-success py-4 text-lg font-bold animate-pulse-glow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            className="w-full rounded-2xl btn-gradient-success py-4 text-lg font-bold animate-breathing-glow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 animate-slide-up"
           >
             Finish Workout
           </button>
@@ -230,7 +230,7 @@ function TodayContent() {
         </label>
         <textarea
           id="daily-log"
-          className="mt-1.5 w-full rounded-2xl border border-border bg-card/50 backdrop-blur px-4 py-3 text-sm placeholder:text-muted-foreground/50 focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+          className="mt-1.5 w-full rounded-2xl border border-border bg-card/50 backdrop-blur px-4 py-3 text-sm placeholder:text-muted-foreground/50 focus:outline-none input-glow transition-all"
           placeholder={
             [
               "How are you feeling today?",
