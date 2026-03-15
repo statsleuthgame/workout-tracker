@@ -28,23 +28,19 @@ export function BottomNav() {
                 key={item.href}
                 href={item.href}
                 aria-current={isActive ? "page" : undefined}
-                className={`relative flex flex-1 flex-col items-center gap-1 py-3 text-xs transition-all duration-200 ${
+                prefetch={true}
+                className={`relative flex flex-1 flex-col items-center gap-1 py-3 text-xs transition-colors duration-150 ${
                   isActive
                     ? "text-primary"
                     : "text-muted-foreground hover:text-foreground active:scale-95"
                 }`}
               >
-                <div className={`relative transition-all duration-300 ${isActive ? "scale-110" : ""}`}>
-                  <item.Icon className="h-5 w-5" />
-                  {isActive && (
-                    <div className="absolute -inset-2 rounded-full bg-primary/10 -z-10 animate-breathing-glow" />
-                  )}
-                </div>
+                <item.Icon className={`h-5 w-5 transition-transform duration-150 ${isActive ? "scale-110" : ""}`} />
                 <span className={`text-[11px] font-medium ${isActive ? "font-semibold" : ""}`}>
                   {item.label}
                 </span>
                 {isActive && (
-                  <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-8 h-[3px] rounded-full nav-glow-dot" style={{ background: "var(--gradient-primary)" }} />
+                  <span className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-6 h-[3px] rounded-full" style={{ background: "var(--gradient-primary)" }} />
                 )}
               </Link>
             );
