@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback, useMemo, useRef, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
+import Image from "next/image";
 import { ExerciseCard } from "@/components/workout/exercise-card";
 import { useTemplateForDay, useSetLogs, useProgram } from "@/lib/db/hooks";
 import { db } from "@/lib/db/database";
@@ -54,6 +55,8 @@ function TodayContent() {
   const [workoutLogId, setWorkoutLogId] = useState<string | null>(null);
   const [workoutNotes, setWorkoutNotes] = useState("");
   const [isFinished, setIsFinished] = useState(false);
+  const [showMeme, setShowMeme] = useState(false);
+  const [memeExiting, setMemeExiting] = useState(false);
   const setLogs = useSetLogs(workoutLogId ?? undefined);
 
   // Debounced notes save
@@ -98,7 +101,15 @@ function TodayContent() {
       completedAt: new Date().toISOString(),
     });
     setIsFinished(true);
+    setShowMeme(true);
     navigator.vibrate?.([50, 100, 50]);
+
+    // After 4.2s start exit animation, then hide at 5s
+    setTimeout(() => setMemeExiting(true), 4200);
+    setTimeout(() => {
+      setShowMeme(false);
+      setMemeExiting(false);
+    }, 4700);
   }, [workoutLogId]);
 
   if (!template || !program) {
@@ -254,6 +265,22 @@ function TodayContent() {
           }}
         />
       </div>
+
+      {/* Stay Strong meme overlay */}
+      {showMeme && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className={memeExiting ? "animate-spin-out" : "animate-spin-in"}>
+            <Image
+              src="/stay-strong.png"
+              alt="Stay Strong!"
+              width={280}
+              height={280}
+              className="rounded-2xl shadow-2xl"
+              priority
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
