@@ -1,87 +1,66 @@
 import { db, type SetLog } from "../db/database";
 
 export interface ProgressionSuggestion {
-  targetWeight: number | null;
+  targetWeight: number | null; // suggested working weight (= last completed weight)
+  lastWeight: number | null; // most recent completed weight, for pre-filling inputs
   targetReps: number;
-  label: string; // e.g. "Last: 95 x 8 → Try: 100 x 8"
+  label: string; // e.g. "Last: 95 lbs · target 8-10 reps"
 }
 
 /**
- * Calculate progressive overload suggestion for an exercise.
- * Uses the most recent completed sets for that exercise to suggest next weight/reps.
+ * Calculate the progressive-overload reference for an exercise.
+ *
+ * Reps are not tracked per set in the current UI (one tap = one completed
+ * exercise), so progression is weight-based: surface the most recent COMPLETED
+ * weight and the template's rep target. The weight input is pre-filled with the
+ * last weight, so the user nudges it up to progress.
  */
 export async function calculateProgression(
   exerciseId: string,
   targetReps: string // e.g. "8-10" or "12"
 ): Promise<ProgressionSuggestion | null> {
-  // Get all past set logs for this exercise, most recent first
+  // Only consider sets that were actually completed with a recorded weight.
+  // Filter FIRST, then pick the most recent session — otherwise a not-yet-done
+  // log for today (pre-filled weight, completed=false) hides the real history.
   const pastSets = await db.setLogs
     .where("exerciseId")
     .equals(exerciseId)
     .toArray();
 
-  if (pastSets.length === 0) return null;
+  const completedSets = pastSets.filter(
+    (s) => s.completed && s.actualWeight != null
+  );
+  if (completedSets.length === 0) return null;
 
-  // Group by workoutLogId and find the most recent workout
+  // Group the completed sets by workout, then find the most recent workout date.
   const byWorkout = new Map<string, SetLog[]>();
-  for (const set of pastSets) {
+  for (const set of completedSets) {
     const existing = byWorkout.get(set.workoutLogId) || [];
     existing.push(set);
     byWorkout.set(set.workoutLogId, existing);
   }
 
-  // Get workout logs to find dates
-  const workoutIds = Array.from(byWorkout.keys());
-  const workoutLogs = await db.workoutLogs.bulkGet(workoutIds);
-
-  // Sort by date descending
+  const workoutLogs = await db.workoutLogs.bulkGet(Array.from(byWorkout.keys()));
   const sorted = workoutLogs
-    .filter((w): w is NonNullable<typeof w> => w !== undefined)
+    .filter((w): w is NonNullable<typeof w> => w != null)
     .sort((a, b) => b.date.localeCompare(a.date));
-
   if (sorted.length === 0) return null;
 
-  const lastWorkoutId = sorted[0].id;
-  const lastSets = byWorkout.get(lastWorkoutId) || [];
-  const completedSets = lastSets.filter((s) => s.completed && s.actualWeight);
+  const lastSets = byWorkout.get(sorted[0].id) || [];
+  if (lastSets.length === 0) return null;
 
-  if (completedSets.length === 0) return null;
-
-  // Calculate average weight and reps from last session
   const avgWeight =
-    completedSets.reduce((sum, s) => sum + (s.actualWeight || 0), 0) /
-    completedSets.length;
-  const avgReps =
-    completedSets.reduce((sum, s) => sum + (s.actualReps || 0), 0) /
-    completedSets.length;
+    lastSets.reduce((sum, s) => sum + (s.actualWeight || 0), 0) /
+    lastSets.length;
+  const lastWeight = Math.round(avgWeight);
+  const parsed = parseReps(targetReps);
 
-  // Parse target reps
-  const parsedTarget = parseReps(targetReps);
-
-  // Progression logic:
-  // If they hit the top of the rep range last time → suggest weight increase
-  // Otherwise → suggest same weight, aim for more reps
-  const hitTopOfRange = avgReps >= parsedTarget.max;
-  const roundedLastWeight = Math.round(avgWeight);
-
-  if (hitTopOfRange) {
-    // Bump weight by ~5 lbs (or 2.5 for smaller muscles)
-    const increment = avgWeight < 30 ? 2.5 : 5;
-    const newWeight = Math.round(avgWeight + increment);
-    return {
-      targetWeight: newWeight,
-      targetReps: parsedTarget.min,
-      label: `Last: ${roundedLastWeight} x ${Math.round(avgReps)} → Try: ${newWeight} x ${parsedTarget.min}`,
-    };
-  } else {
-    // Same weight, push for more reps
-    const targetRepCount = Math.min(Math.round(avgReps) + 1, parsedTarget.max);
-    return {
-      targetWeight: roundedLastWeight,
-      targetReps: targetRepCount,
-      label: `Last: ${roundedLastWeight} x ${Math.round(avgReps)} → Try: ${roundedLastWeight} x ${targetRepCount}`,
-    };
-  }
+  return {
+    targetWeight: lastWeight,
+    lastWeight,
+    targetReps: parsed.max,
+    label: `Last: ${lastWeight} lbs · target ${targetReps} reps`,
+  };
 }
 
 function parseReps(reps: string): { min: number; max: number } {
@@ -91,20 +70,4 @@ function parseReps(reps: string): { min: number; max: number } {
   const min = parseInt(match[1]);
   const max = match[2] ? parseInt(match[2]) : min;
   return { min, max };
-}
-
-/**
- * Get the last weight used for an exercise (for pre-filling inputs)
- */
-export async function getLastWeight(exerciseId: string): Promise<number | null> {
-  const pastSets = await db.setLogs
-    .where("exerciseId")
-    .equals(exerciseId)
-    .toArray();
-
-  const completed = pastSets
-    .filter((s) => s.completed && s.actualWeight)
-    .sort((a, b) => (b.completedAt || "").localeCompare(a.completedAt || ""));
-
-  return completed.length > 0 ? completed[0].actualWeight || null : null;
 }

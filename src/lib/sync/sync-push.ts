@@ -75,16 +75,37 @@ export async function pushPendingChanges() {
 
     const processedIds: number[] = [];
 
-    for (const [tableName, records] of byTable) {
+    // Push in dependency order so set_logs never reach the cloud before the
+    // workout_logs they reference.
+    const TABLE_ORDER = ["workoutLogs", "setLogs", "bodyMetrics"];
+    for (const tableName of TABLE_ORDER) {
+      const records = byTable.get(tableName);
+      if (!records || records.length === 0) continue;
       const pgTable = TABLE_NAMES[tableName];
       if (!pgTable) continue;
 
-      const mapped = records.map((r) => toSnakeCase(tableName, r.data));
+      // Collapse duplicate ids within this batch (keep latest), but track every
+      // queueId so all duplicates clear on a successful push. A single upsert
+      // statement that touches the same id twice raises a Postgres cardinality
+      // error and would otherwise wedge this table's queue forever.
+      const latestById = new Map<string, Record<string, unknown>>();
+      const batchQueueIds: number[] = [];
+      for (const r of records) {
+        batchQueueIds.push(r.queueId);
+        const id = (r.data as { id?: string }).id;
+        if (id != null) latestById.set(id, r.data);
+      }
+
+      const mapped = Array.from(latestById.values()).map((d) => toSnakeCase(tableName, d));
+      if (mapped.length === 0) {
+        processedIds.push(...batchQueueIds);
+        continue;
+      }
 
       const { error } = await supabase.from(pgTable).upsert(mapped, { onConflict: "id" });
 
       if (!error) {
-        processedIds.push(...records.map((r) => r.queueId));
+        processedIds.push(...batchQueueIds);
       } else {
         console.warn(`[sync] Failed to push ${tableName}:`, error.message);
       }

@@ -23,15 +23,19 @@ export default function WeightLogPage() {
   const [weight, setWeight] = useState("");
   const [notes, setNotes] = useState("");
 
+  const parsedWeight = parseFloat(weight);
+  const isValidWeight =
+    Number.isFinite(parsedWeight) && parsedWeight > 0 && parsedWeight <= 1500;
+
   const handleLog = async () => {
-    if (!weight) return;
+    if (!isValidWeight) return;
     const dateStr = getDateString();
     const id = `metric-${dateStr}`;
 
     await db.bodyMetrics.put({
       id,
       date: dateStr,
-      weight: parseFloat(weight),
+      weight: parsedWeight,
       notes: notes || undefined,
     });
 
@@ -118,14 +122,18 @@ export default function WeightLogPage() {
           <input
             type="number"
             inputMode="decimal"
+            min={0}
+            max={1500}
+            step={0.1}
             value={weight}
             onChange={(e) => setWeight(e.target.value)}
             placeholder="Weight (lbs)"
-            className="flex-1 rounded-2xl border border-border/50 bg-background/50 px-4 py-3 text-base outline-none placeholder:text-muted-foreground/50 input-glow"
+            aria-label="Weight in pounds"
+            className="flex-1 rounded-2xl border border-border/50 bg-background/50 px-4 py-3 text-base outline-none placeholder:text-muted-foreground input-glow"
           />
           <button
             onClick={handleLog}
-            disabled={!weight}
+            disabled={!isValidWeight}
             className="rounded-2xl btn-gradient-primary px-6 py-3 text-sm font-bold active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50"
           >
             Log
@@ -136,7 +144,8 @@ export default function WeightLogPage() {
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           placeholder="Notes (optional)"
-          className="w-full rounded-2xl border border-border/50 bg-background/50 px-4 py-3 text-sm outline-none placeholder:text-muted-foreground/50 input-glow"
+          aria-label="Notes (optional)"
+          className="w-full rounded-2xl border border-border/50 bg-background/50 px-4 py-3 text-sm outline-none placeholder:text-muted-foreground input-glow"
         />
       </Card>
 

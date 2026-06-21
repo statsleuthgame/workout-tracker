@@ -1,13 +1,12 @@
 "use client";
 
-import { useState } from "react";
-
 interface NumberInputProps {
   value: number | undefined;
   onChange: (value: number | undefined) => void;
   placeholder?: string;
   step?: number;
   min?: number;
+  ariaLabel?: string;
   className?: string;
 }
 
@@ -17,10 +16,9 @@ export function NumberInput({
   placeholder = "0",
   step = 5,
   min = 0,
+  ariaLabel,
   className = "",
 }: NumberInputProps) {
-  const [focused, setFocused] = useState(false);
-
   return (
     <div className={`flex items-center gap-1.5 ${className}`}>
       <button
@@ -34,15 +32,16 @@ export function NumberInput({
       <input
         type="number"
         inputMode="decimal"
-        value={focused ? (value ?? "") : (value ?? "")}
+        min={min}
+        step={step}
+        value={value ?? ""}
         onChange={(e) => {
           const v = e.target.value;
           onChange(v === "" ? undefined : parseFloat(v));
         }}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
         placeholder={placeholder}
-        className="h-12 w-20 rounded-2xl border border-border bg-background/50 text-center text-lg font-bold outline-none placeholder:text-muted-foreground/50 input-glow tabular-nums"
+        aria-label={ariaLabel}
+        className="h-12 w-20 rounded-2xl border border-border bg-background/50 text-center text-lg font-bold outline-none placeholder:text-muted-foreground input-glow tabular-nums"
       />
       <button
         type="button"

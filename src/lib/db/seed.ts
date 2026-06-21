@@ -19,9 +19,6 @@ export async function seedDatabase() {
     id: PROGRAM_ID,
     name: "Push Pull Legs",
     phase: "6-Day Split · Lean & Strong",
-    startDate: "2026-03-08",
-    weeks: 1,
-    weightLossTarget: "Lean & strong",
     createdAt: new Date().toISOString(),
   });
 
@@ -47,7 +44,6 @@ export async function seedDatabase() {
     units: settings?.units ?? "lbs",
     restTimerDefault: settings?.restTimerDefault ?? 90,
     theme: settings?.theme ?? "system",
-    programStartDate: "2026-03-08",
     seedVersion: SEED_VERSION,
   });
 }

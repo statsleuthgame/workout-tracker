@@ -9,10 +9,9 @@ import { db, type SetLog } from "@/lib/db/database";
 import { useExercise } from "@/lib/db/hooks";
 import {
   calculateProgression,
-  getLastWeight,
   type ProgressionSuggestion,
 } from "@/lib/progression/engine";
-import { CheckCircle2, ChevronDown } from "lucide-react";
+import { CheckCircle2, ChevronDown, PlayCircle } from "lucide-react";
 import { getThemeColor } from "@/lib/constants/theme-colors";
 
 interface ExerciseCardProps {
@@ -22,7 +21,6 @@ interface ExerciseCardProps {
   targetReps: string;
   notes: string;
   slotType: "fixed" | "rotating";
-  slotName: string;
   existingSets: SetLog[];
   dayTheme?: string;
 }
@@ -34,7 +32,6 @@ export function ExerciseCard({
   targetReps,
   notes,
   slotType,
-  slotName,
   existingSets,
   dayTheme,
 }: ExerciseCardProps) {
@@ -49,11 +46,6 @@ export function ExerciseCard({
 
   const isCardio = targetReps.toLowerCase().includes("min");
 
-  useEffect(() => {
-    if (isCardio) return;
-    calculateProgression(exerciseId, targetReps).then(setSuggestion);
-  }, [exerciseId, targetReps, isCardio]);
-
   // Find existing log for this exercise (single record per exercise)
   const existingLog = existingSets.find(
     (s) => s.exerciseId === exerciseId && s.setNumber === 1
@@ -64,37 +56,42 @@ export function ExerciseCard({
 
   const setId = `${workoutLogId}-${exerciseId}-1`;
 
-  // Auto-fill weight from last workout if no weight entered yet
+  // Load the progression reference and auto-fill the weight from the last
+  // completed session — one history scan serves both. The card is keyed on
+  // workoutLogId, so hasAutoFilled resets when navigating to another day.
   useEffect(() => {
-    if (isCardio || hasAutoFilled.current) return;
-    if (existingLog?.actualWeight) {
+    if (isCardio) return;
+    let cancelled = false;
+    calculateProgression(exerciseId, targetReps).then((result) => {
+      if (cancelled) return;
+      setSuggestion(result);
+
+      if (hasAutoFilled.current || !result?.lastWeight) return;
       hasAutoFilled.current = true;
-      return;
-    }
-    getLastWeight(exerciseId).then((lastWeight) => {
-      if (lastWeight && !hasAutoFilled.current) {
-        hasAutoFilled.current = true;
-        // Save to DB so it persists
-        db.setLogs.get(setId).then((existing) => {
-          if (existing) {
-            if (!existing.actualWeight) {
-              db.setLogs.update(setId, { actualWeight: lastWeight });
-            }
-          } else {
-            db.setLogs.put({
-              id: setId,
-              workoutLogId,
-              exerciseId,
-              setNumber: 1,
-              targetReps: parseTargetReps(targetReps),
-              actualWeight: lastWeight,
-              completed: false,
-            });
+      const lastWeight = result.lastWeight;
+      db.setLogs.get(setId).then((existing) => {
+        if (cancelled) return;
+        if (existing) {
+          if (existing.actualWeight == null) {
+            db.setLogs.update(setId, { actualWeight: lastWeight });
           }
-        });
-      }
+        } else {
+          db.setLogs.put({
+            id: setId,
+            workoutLogId,
+            exerciseId,
+            setNumber: 1,
+            targetReps: parseTargetReps(targetReps),
+            actualWeight: lastWeight,
+            completed: false,
+          });
+        }
+      });
     });
-  }, [exerciseId, setId, existingLog?.actualWeight, isCardio, workoutLogId, targetReps]);
+    return () => {
+      cancelled = true;
+    };
+  }, [exerciseId, targetReps, isCardio, setId, workoutLogId]);
 
   const handleToggleComplete = useCallback(async () => {
     const newCompleted = !completed;
@@ -158,12 +155,7 @@ export function ExerciseCard({
     );
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      setExpanded(!expanded);
-    }
-  };
+  const detail = isCardio ? targetReps : `${targetSets} sets x ${targetReps}`;
 
   return (
     <Card
@@ -171,52 +163,52 @@ export function ExerciseCard({
         completed ? "border-success/30 bg-success-muted/30" : "card-hover"
       } ${popping ? "animate-pop" : ""}`}
     >
-      <div
-        role="button"
-        tabIndex={0}
-        onClick={() => setExpanded(!expanded)}
-        onKeyDown={handleKeyDown}
-        aria-expanded={expanded}
-        aria-label={`${exercise.name} — ${targetSets} sets x ${targetReps}`}
-        className="flex w-full items-center justify-between pl-5 pr-4 py-3.5 text-left cursor-pointer"
-      >
-        <div className="flex-1">
-          <div className="flex items-center gap-2">
-            {exercise.videoUrl ? (
-              <a
-                href={exercise.videoUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-bold text-sm text-info underline decoration-info/30 underline-offset-2 hover:decoration-info/60 transition-colors"
-                onClick={(e) => e.stopPropagation()}
-              >
-                {exercise.name}
-              </a>
-            ) : (
-              <h3 className="font-bold text-sm">{exercise.name}</h3>
-            )}
-            {slotType === "rotating" && (
-              <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
-                Variety
-              </Badge>
-            )}
-          </div>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {isCardio ? targetReps : `${targetSets} sets x ${targetReps}`} · {notes}
-          </p>
-        </div>
+      <div className="flex items-center gap-1 pl-5 pr-4 py-3.5">
+        <button
+          type="button"
+          onClick={() => setExpanded(!expanded)}
+          aria-expanded={expanded}
+          aria-label={`${exercise.name} — ${detail}`}
+          className="flex flex-1 items-center justify-between gap-2 min-w-0 text-left cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg"
+        >
+          <span className="flex-1 min-w-0">
+            <span className="flex items-center gap-2">
+              <span className="font-bold text-sm truncate">{exercise.name}</span>
+              {slotType === "rotating" && (
+                <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
+                  Variety
+                </Badge>
+              )}
+            </span>
+            <span className="block text-xs text-muted-foreground mt-0.5">
+              {detail} · {notes}
+            </span>
+          </span>
 
-        <div className="flex items-center gap-2">
-          {completed && (
-            <CheckCircle2 className="h-5 w-5 text-success" aria-hidden="true" />
-          )}
-          <ChevronDown
-            className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${
-              expanded ? "rotate-180" : ""
-            }`}
-            aria-hidden="true"
-          />
-        </div>
+          <span className="flex items-center gap-2 shrink-0">
+            {completed && (
+              <CheckCircle2 className="h-5 w-5 text-success" aria-hidden="true" />
+            )}
+            <ChevronDown
+              className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${
+                expanded ? "rotate-180" : ""
+              }`}
+              aria-hidden="true"
+            />
+          </span>
+        </button>
+
+        {exercise.videoUrl && (
+          <a
+            href={exercise.videoUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`Watch ${exercise.name} form video`}
+            className="shrink-0 rounded-lg p-1.5 text-info transition-colors hover:bg-info-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <PlayCircle className="h-5 w-5" aria-hidden="true" />
+          </a>
+        )}
       </div>
 
       {expanded && (
@@ -242,6 +234,7 @@ export function ExerciseCard({
                   onChange={handleWeightChange}
                   placeholder="Lbs"
                   step={5}
+                  ariaLabel={`${exercise.name} weight in pounds`}
                 />
               </div>
             )}

@@ -52,19 +52,26 @@ function TodayContent() {
   // Debounced notes save
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
-  // Celebration phrase (stable per mount)
-  const celebrationPhrase = useMemo(
-    () => CELEBRATION_PHRASES[Math.floor(Math.random() * CELEBRATION_PHRASES.length)],
-    []
-  );
+  // Celebration phrase — deterministic from the date (pure render, SSR-stable).
+  const celebrationPhrase = useMemo(() => {
+    const seed = [...dateStr].reduce((sum, c) => sum + c.charCodeAt(0), 0);
+    return CELEBRATION_PHRASES[seed % CELEBRATION_PHRASES.length];
+  }, [dateStr]);
 
-  // Create or find workout log — use date-specific ID to prevent collisions
+  // Create or find the workout log — date-specific ID prevents collisions.
+  // Skips rest days (no exercises) so viewing Sunday never writes a phantom log,
+  // and a `cancelled` flag prevents a slow lookup for one date from applying a
+  // stale workoutLogId after a fast switch to another date.
   useEffect(() => {
-    if (!template) return;
+    // Skip until the template loads, and skip rest days (no exercises) so
+    // viewing Sunday never writes a phantom log.
+    if (!template || template.exercises.length === 0) return;
 
+    let cancelled = false;
     (async () => {
       const logId = `log-${template.id}-${dateStr}`;
       const existing = await db.workoutLogs.get(logId);
+      if (cancelled) return;
 
       if (existing) {
         setWorkoutLogId(existing.id);
@@ -78,11 +85,16 @@ function TodayContent() {
           startedAt: new Date().toISOString(),
           notes: "",
         });
+        if (cancelled) return;
         setWorkoutLogId(logId);
         setWorkoutNotes("");
         setIsFinished(false);
       }
     })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [template, dateStr]);
 
   const handleFinishWorkout = useCallback(async () => {
@@ -184,14 +196,13 @@ function TodayContent() {
         <div className="space-y-3 stagger-children">
           {template.exercises.map((ex) => (
             <ExerciseCard
-              key={`${ex.exerciseId}-${ex.order}`}
+              key={`${workoutLogId}-${ex.exerciseId}-${ex.order}`}
               exerciseId={ex.exerciseId}
               workoutLogId={workoutLogId}
               targetSets={ex.targetSets}
               targetReps={ex.targetReps}
               notes={ex.notes}
               slotType={ex.slotType}
-              slotName={ex.slotName}
               existingSets={setLogs || []}
               dayTheme={template.dayTheme}
             />
@@ -231,14 +242,14 @@ function TodayContent() {
         </label>
         <textarea
           id="daily-log"
-          className="mt-1.5 w-full rounded-2xl border border-border bg-card/50 backdrop-blur px-4 py-3 text-sm placeholder:text-muted-foreground/50 focus:outline-none input-glow transition-all"
+          className="mt-1.5 w-full rounded-2xl border border-border bg-card/50 backdrop-blur px-4 py-3 text-sm placeholder:text-muted-foreground focus:outline-none input-glow transition-all"
           placeholder={
             [
               "How are you feeling today?",
               "Energy level? Mood? Wins?",
               "Anything worth remembering about today?",
               "What went well? What was tough?",
-            ][new Date().getDay() % 4]
+            ][dayOfWeek % 4]
           }
           rows={3}
           value={workoutNotes}
@@ -256,13 +267,23 @@ function TodayContent() {
         />
       </div>
 
-      {/* Stay Strong meme overlay */}
+      {/* Stay Strong meme overlay — decorative; tap to dismiss early */}
       {showMeme && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+          aria-hidden="true"
+          onClick={() => {
+            setMemeExiting(true);
+            setTimeout(() => {
+              setShowMeme(false);
+              setMemeExiting(false);
+            }, 500);
+          }}
+        >
           <div className={memeExiting ? "animate-spin-out" : "animate-spin-in"}>
             <Image
               src="/stay-strong.png"
-              alt="Stay Strong!"
+              alt=""
               width={280}
               height={280}
               className="rounded-2xl shadow-2xl"

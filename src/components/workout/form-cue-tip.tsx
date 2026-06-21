@@ -9,9 +9,9 @@ export function FormCueTip({ cues }: FormCueTipProps) {
 
   return (
     <div className="flex flex-wrap gap-1.5">
-      {cues.map((cue, i) => (
+      {cues.map((cue) => (
         <span
-          key={i}
+          key={cue}
           className="rounded-full bg-success-muted px-2.5 py-0.5 text-xs font-medium text-success"
         >
           {cue}

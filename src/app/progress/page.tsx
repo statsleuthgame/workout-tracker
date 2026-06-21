@@ -28,70 +28,63 @@ export default function ProgressPage() {
   const completedWorkouts =
     workoutLogs?.filter((w) => w.completedAt) || [];
 
-  // Calculate weekly volume (total sets completed per week)
-  const weeklyVolume = useLiveQuery(async () => {
-    const allSets = await db.setLogs.toArray();
-    const completed = allSets.filter((s) => s.completed);
-    const allLogs = await db.workoutLogs.toArray();
+  // Weekly volume + per-exercise weight progress, computed from a single pass
+  // over each table (one scan each instead of two per chart).
+  const charts = useLiveQuery(async () => {
+    const [allSets, allLogs, exercises] = await Promise.all([
+      db.setLogs.toArray(),
+      db.workoutLogs.toArray(),
+      db.exercises.toArray(),
+    ]);
 
     const logDateMap = new Map<string, string>();
     allLogs.forEach((log) => logDateMap.set(log.id, log.date));
 
     const byWeek = new Map<string, number>();
-    completed.forEach((set) => {
+    const byExercise = new Map<string, { weight: number; date: string }[]>();
+
+    for (const set of allSets) {
+      if (!set.completed) continue;
       const date = logDateMap.get(set.workoutLogId);
-      if (!date) return;
+      if (!date) continue;
+
+      // Weekly completed-set volume
       const d = new Date(date + "T12:00:00");
       const weekStart = new Date(d);
       weekStart.setDate(d.getDate() - d.getDay());
       const key = weekStart.toISOString().split("T")[0];
       byWeek.set(key, (byWeek.get(key) || 0) + 1);
-    });
 
-    return Array.from(byWeek.entries())
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([week, sets]) => ({
-        week: formatDate(week),
-        sets,
-      }));
-  });
+      // Per-exercise weight points (needs a recorded weight)
+      if (set.actualWeight != null) {
+        const arr = byExercise.get(set.exerciseId) || [];
+        arr.push({ weight: set.actualWeight, date });
+        byExercise.set(set.exerciseId, arr);
+      }
+    }
 
-  // Exercise-specific progress (top exercises by frequency)
-  const exerciseProgress = useLiveQuery(async () => {
-    const allSets = await db.setLogs.toArray();
-    const completed = allSets.filter(
-      (s) => s.completed && s.actualWeight
-    );
-
-    const byExercise = new Map<string, { weight: number; date: string }[]>();
-    const allLogs = await db.workoutLogs.toArray();
-    const logDateMap = new Map<string, string>();
-    allLogs.forEach((log) => logDateMap.set(log.id, log.date));
-
-    completed.forEach((set) => {
-      const date = logDateMap.get(set.workoutLogId) || "";
-      const existing = byExercise.get(set.exerciseId) || [];
-      existing.push({ weight: set.actualWeight!, date });
-      byExercise.set(set.exerciseId, existing);
-    });
-
-    const exercises = await db.exercises.toArray();
     const nameMap = new Map<string, string>();
     exercises.forEach((e) => nameMap.set(e.id, e.name));
 
-    return Array.from(byExercise.entries())
+    const weeklyVolume = Array.from(byWeek.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([week, sets]) => ({ week: formatDate(week), sets }));
+
+    const exerciseProgress = Array.from(byExercise.entries())
       .sort(([, a], [, b]) => b.length - a.length)
       .slice(0, 5)
       .map(([id, data]) => ({
         name: nameMap.get(id) || id,
         data: data
           .sort((a, b) => a.date.localeCompare(b.date))
-          .map((d) => ({
-            date: formatDate(d.date),
-            weight: d.weight,
-          })),
+          .map((d) => ({ date: formatDate(d.date), weight: d.weight })),
       }));
+
+    return { weeklyVolume, exerciseProgress };
   });
+
+  const weeklyVolume = charts?.weeklyVolume;
+  const exerciseProgress = charts?.exerciseProgress;
 
   const weightData =
     bodyMetrics?.map((m) => ({

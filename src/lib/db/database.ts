@@ -6,9 +6,6 @@ export interface Program {
   id: string;
   name: string;
   phase: string;
-  startDate: string; // ISO date
-  weeks: number;
-  weightLossTarget: string;
   createdAt: string;
 }
 
@@ -77,7 +74,6 @@ export interface UserSettings {
   units: "lbs" | "kg";
   restTimerDefault: number;
   theme: "light" | "dark" | "system";
-  programStartDate?: string;
   seedVersion?: number;
 }
 
