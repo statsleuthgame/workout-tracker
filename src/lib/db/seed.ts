@@ -1,9 +1,9 @@
 import { db } from "./database";
 import { exerciseLibrary } from "../workout-plan/exercises";
-import { weeklyTemplate, getExercisesForDayWeek } from "../workout-plan/templates";
+import { weeklyPlan } from "../workout-plan/templates";
 
 const PROGRAM_ID = "march-26-protocol";
-const SEED_VERSION = 5; // bump this to force re-seed of templates & exercises
+const SEED_VERSION = 6; // bump this to force re-seed of templates & exercises
 
 export async function seedDatabase() {
   const settings = await db.userSettings.get("default");
@@ -11,44 +11,42 @@ export async function seedDatabase() {
 
   if (!needsReseed) return;
 
-  // Always update exercises (adds videoUrl, removes partner exercises)
+  // Always update exercises (adds new movements, refreshes form cues / videos)
   await db.exercises.bulkPut(exerciseLibrary);
 
-  // Seed or update program
+  // Seed or update program metadata
   await db.programs.put({
     id: PROGRAM_ID,
-    name: "March '26 Protocol",
-    phase: "Phase 4: Volume & Intensity",
+    name: "Push Pull Legs",
+    phase: "6-Day Split · Lean & Strong",
     startDate: "2026-03-08",
-    weeks: 5,
-    weightLossTarget: "5-7 lbs",
+    weeks: 1,
+    weightLossTarget: "Lean & strong",
     createdAt: new Date().toISOString(),
   });
 
-  // Reseed all workout templates (Saturday changed to full body, etc.)
-  const templates = [];
-  for (let week = 1; week <= 5; week++) {
-    for (const day of weeklyTemplate) {
-      templates.push({
-        id: `${PROGRAM_ID}-w${week}-d${day.dayOfWeek}`,
-        programId: PROGRAM_ID,
-        weekNumber: week,
-        dayOfWeek: day.dayOfWeek,
-        dayLabel: day.dayLabel,
-        dayTheme: day.dayTheme,
-        exercises: getExercisesForDayWeek(day, week),
-      });
-    }
-  }
+  // Evergreen routine: one template per day of week. Remove any templates from
+  // a previous program structure so day lookups never collide.
+  await db.workoutTemplates.where("programId").equals(PROGRAM_ID).delete();
+
+  const templates = weeklyPlan.map((day) => ({
+    id: `${PROGRAM_ID}-d${day.dayOfWeek}`,
+    programId: PROGRAM_ID,
+    weekNumber: 1,
+    dayOfWeek: day.dayOfWeek,
+    dayLabel: day.dayLabel,
+    dayTheme: day.dayTheme,
+    exercises: day.exercises,
+  }));
   await db.workoutTemplates.bulkPut(templates);
 
   // Update settings with seed version
   await db.userSettings.put({
     id: "default",
-    name: "",
-    units: "lbs",
-    restTimerDefault: 90,
-    theme: "system",
+    name: settings?.name ?? "",
+    units: settings?.units ?? "lbs",
+    restTimerDefault: settings?.restTimerDefault ?? 90,
+    theme: settings?.theme ?? "system",
     programStartDate: "2026-03-08",
     seedVersion: SEED_VERSION,
   });

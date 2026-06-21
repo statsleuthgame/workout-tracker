@@ -17,12 +17,12 @@ export function getThemeColor(dayTheme: string) {
 
 export function getThemeLabel(dayTheme: string): string {
   const labels: Record<string, string> = {
-    "pull-back": "Pull · Back",
-    "pull-rear": "Pull · Rear Delts",
-    "push-chest": "Push · Chest",
-    "push-shoulder": "Push · Shoulders",
-    "legs-foundation": "Legs · Foundation",
-    "legs-hypertrophy": "Legs · Hypertrophy",
+    "pull-back": "Pull",
+    "pull-rear": "Pull",
+    "push-chest": "Push",
+    "push-shoulder": "Push",
+    "legs-foundation": "Legs · Quads",
+    "legs-hypertrophy": "Legs · Glutes",
     "recovery": "Active Recovery",
     "rest": "Rest Day",
   };

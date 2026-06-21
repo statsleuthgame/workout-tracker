@@ -3,76 +3,101 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import {
-  useTemplatesForWeek,
+  useWeekTemplates,
   useProgram,
-  useCompletedWorkoutsForWeek,
+  useCompletedDatesInRange,
 } from "@/lib/db/hooks";
 import {
-  getWeekNumber,
   getDayAbbrev,
-  getDateForDayInWeek,
+  getDateString,
+  getWeekDates,
+  formatWeekRange,
+  isSameDay,
 } from "@/lib/utils/dates";
 import { PageHeader } from "@/components/common/page-header";
 import { StatCard } from "@/components/common/stat-card";
 import { getThemeColor, getThemeLabel } from "@/lib/constants/theme-colors";
-import { Check, ChevronRight, Coffee, Dumbbell } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, Coffee, Dumbbell } from "lucide-react";
 import Link from "next/link";
 
 export default function WeekPage() {
-  const currentWeek = getWeekNumber();
-  const [selectedWeek, setSelectedWeek] = useState(currentWeek);
+  const [weekOffset, setWeekOffset] = useState(0);
   const program = useProgram();
-  const templates = useTemplatesForWeek(selectedWeek);
-  const completedWorkouts = useCompletedWorkoutsForWeek(selectedWeek);
+  const templates = useWeekTemplates();
 
-  if (!program) {
+  const weekDates = getWeekDates(weekOffset);
+  const startStr = getDateString(weekDates[0]);
+  const endStr = getDateString(weekDates[6]);
+  const completedDates = useCompletedDatesInRange(startStr, endStr);
+
+  if (!program || !templates) {
     return (
       <div className="space-y-4 px-4 pt-6">
         <div className="h-9 w-48 animate-pulse rounded-xl bg-muted" />
         <div className="h-5 w-32 animate-pulse rounded bg-muted" />
-        <div className="flex gap-2">
-          {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="h-11 flex-1 animate-pulse rounded-xl bg-muted" />
-          ))}
-        </div>
-        {[1, 2, 3, 4].map((i) => (
+        <div className="h-12 animate-pulse rounded-xl bg-muted" />
+        {[1, 2, 3, 4, 5].map((i) => (
           <div key={i} className="h-20 animate-pulse rounded-xl bg-muted" />
         ))}
       </div>
     );
   }
 
-  const completedTemplateIds = new Set(
-    completedWorkouts?.map((w) => w.templateId) || []
-  );
+  // dayOfWeek -> template
+  const templateByDay = new Map(templates.map((t) => [t.dayOfWeek, t]));
 
-  const workoutTemplates = templates?.filter((t) => t.dayTheme !== "rest");
-  const totalDays = workoutTemplates?.length || 0;
-  const completedDays = workoutTemplates?.filter((t) => completedTemplateIds.has(t.id)).length || 0;
-  const totalSetsThisWeek = workoutTemplates?.reduce(
-    (sum, t) => sum + t.exercises.reduce((s, ex) => s + ex.targetSets, 0),
-    0
-  ) || 0;
+  const workoutDates = weekDates.filter((d) => d.getDay() !== 0); // exclude Sunday rest
+  const totalDays = workoutDates.length;
+  const completedDays = workoutDates.filter((d) =>
+    completedDates?.has(getDateString(d))
+  ).length;
+  const totalSetsThisWeek = workoutDates.reduce((sum, d) => {
+    const t = templateByDay.get(d.getDay());
+    return sum + (t?.exercises.reduce((s, ex) => s + ex.targetSets, 0) ?? 0);
+  }, 0);
+
+  // For the current week, rotate so today comes first.
+  const orderedDates =
+    weekOffset === 0
+      ? [...weekDates].sort((a, b) => {
+          const today = new Date().getDay();
+          return ((a.getDay() - today + 7) % 7) - ((b.getDay() - today + 7) % 7);
+        })
+      : weekDates;
 
   return (
     <div className="space-y-4 px-4 pt-6">
       <PageHeader title={program.name} subtitle={program.phase} />
 
-      {/* Week Tabs */}
-      <div className="flex gap-2">
-        {Array.from({ length: program.weeks }, (_, i) => i + 1).map((week) => (
-          <button
-            key={week}
-            onClick={() => setSelectedWeek(week)}
-            className={`flex-1 rounded-2xl py-3 text-sm font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
-              selectedWeek === week
-                ? "btn-gradient-primary text-primary-foreground"
-                : "glass-card text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            W{week}
-          </button>
-        ))}
+      {/* Week navigation */}
+      <div className="glass-card flex items-center justify-between rounded-2xl px-2 py-2">
+        <button
+          onClick={() => setWeekOffset((w) => w - 1)}
+          aria-label="Previous week"
+          className="flex h-9 w-9 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:text-foreground active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <ChevronLeft className="h-5 w-5" />
+        </button>
+        <div className="text-center">
+          <p className="text-sm font-bold">
+            {weekOffset === 0 ? "This Week" : formatWeekRange(weekDates)}
+          </p>
+          {weekOffset !== 0 && (
+            <button
+              onClick={() => setWeekOffset(0)}
+              className="text-[11px] font-medium text-primary hover:underline"
+            >
+              Back to this week
+            </button>
+          )}
+        </div>
+        <button
+          onClick={() => setWeekOffset((w) => w + 1)}
+          aria-label="Next week"
+          className="flex h-9 w-9 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:text-foreground active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <ChevronRight className="h-5 w-5" />
+        </button>
       </div>
 
       {/* Weekly Summary Stats */}
@@ -82,25 +107,27 @@ export default function WeekPage() {
         <StatCard label="Remaining" value={totalDays - completedDays} />
       </div>
 
-      {/* Day Cards — rotate so today is first when viewing current week */}
+      {/* Day Cards */}
       <div className="space-y-2 stagger-children">
-        {(selectedWeek === currentWeek && templates
-          ? [...templates].sort((a, b) => {
-              const today = new Date().getDay();
-              return ((a.dayOfWeek - today + 7) % 7) - ((b.dayOfWeek - today + 7) % 7);
-            })
-          : templates
-        )?.map((template) => {
-          const date = getDateForDayInWeek(selectedWeek, template.dayOfWeek);
+        {orderedDates.map((date) => {
+          const dayOfWeek = date.getDay();
+          const template = templateByDay.get(dayOfWeek);
+          if (!template) return null;
+
+          const dateStr = getDateString(date);
           const dayNum = date.getDate();
-          const isCompleted = completedTemplateIds.has(template.id);
-          const isToday =
-            date.toDateString() === new Date().toDateString();
+          const isCompleted = completedDates?.has(dateStr) ?? false;
+          const isToday = isSameDay(date, new Date());
           const themeColor = getThemeColor(template.dayTheme);
           const themeLabel = getThemeLabel(template.dayTheme);
           const isRestDay = template.dayTheme === "rest";
-          const totalSets = template.exercises.reduce((sum, ex) => sum + ex.targetSets, 0);
-          const exerciseNames = template.exercises.slice(0, 3).map((ex) => ex.slotName || "Exercise");
+          const totalSets = template.exercises.reduce(
+            (sum, ex) => sum + ex.targetSets,
+            0
+          );
+          const exerciseNames = template.exercises
+            .slice(0, 3)
+            .map((ex) => ex.slotName || "Exercise");
           const extraCount = template.exercises.length - 3;
 
           const cardContent = (
@@ -117,7 +144,7 @@ export default function WeekPage() {
                 }`}
               >
                 <span className={`text-[10px] leading-none tracking-wider ${isToday ? "" : themeColor.text}`}>
-                  {getDayAbbrev(template.dayOfWeek)}
+                  {getDayAbbrev(dayOfWeek)}
                 </span>
                 <span className={`text-lg leading-tight ${isToday ? "" : themeColor.text}`}>
                   {dayNum}
@@ -126,9 +153,7 @@ export default function WeekPage() {
 
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <h3 className="font-bold text-sm">
-                    {template.dayLabel}
-                  </h3>
+                  <h3 className="font-bold text-sm">{template.dayLabel}</h3>
                   {isCompleted && (
                     <div className="flex h-5 w-5 items-center justify-center rounded-full bg-success/15">
                       <Check className="h-3 w-3 text-success" aria-hidden="true" />
@@ -165,12 +190,9 @@ export default function WeekPage() {
           );
 
           return isRestDay ? (
-            <div key={template.id}>{cardContent}</div>
+            <div key={dateStr}>{cardContent}</div>
           ) : (
-            <Link
-              key={template.id}
-              href={`/today?week=${selectedWeek}&day=${template.dayOfWeek}`}
-            >
+            <Link key={dateStr} href={`/today?date=${dateStr}`}>
               {cardContent}
             </Link>
           );
@@ -178,12 +200,12 @@ export default function WeekPage() {
       </div>
 
       {/* Empty State */}
-      {(!templates || templates.length === 0) && (
+      {templates.length === 0 && (
         <Card className="px-4 py-10 text-center">
           <Dumbbell className="mx-auto h-16 w-16 text-muted-foreground/20" />
-          <p className="mt-3 text-xl font-extrabold gradient-text">No workouts this week</p>
+          <p className="mt-3 text-xl font-extrabold gradient-text">No workouts yet</p>
           <p className="mt-1 text-sm text-muted-foreground">
-            Check another week or set up your program.
+            Your program is still loading.
           </p>
         </Card>
       )}

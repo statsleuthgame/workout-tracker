@@ -78,7 +78,6 @@ export default function HistoryPage() {
                     </div>
                     <p className="text-xs text-muted-foreground mt-0.5">
                       {formatDate(log.date)}
-                      {log.template && ` · Week ${log.template.weekNumber}`}
                     </p>
                   </div>
                   <div className="text-right">

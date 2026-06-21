@@ -48,6 +48,7 @@ export const exerciseLibrary: Exercise[] = [
 
   // ===== BICEPS =====
   { id: "ez-bar-curl", name: "EZ Bar Curls", muscleGroup: "biceps", equipment: "barbell", formCues: ["Strict form, no swinging", "Full range of motion", "Squeeze at top"], videoUrl: yt("ez bar curl") },
+  { id: "db-curl", name: "Dumbbell Bicep Curls", muscleGroup: "biceps", equipment: "dumbbell", formCues: ["Strict form, no swinging", "Supinate at the top", "Control the negative"], videoUrl: yt("dumbbell bicep curl") },
   { id: "hammer-curl", name: "Hammer Curls", muscleGroup: "biceps", equipment: "dumbbell", formCues: ["Focus on brachialis", "Neutral grip", "No swinging"], videoUrl: yt("hammer curls") },
   { id: "incline-db-curl", name: "Incline DB Curls", muscleGroup: "biceps", equipment: "dumbbell", formCues: ["Full stretch on long head", "Set bench 45 degrees", "Slow eccentric"], videoUrl: yt("incline dumbbell curl") },
   { id: "preacher-curl", name: "Preacher Curls", muscleGroup: "biceps", equipment: "dumbbell", formCues: ["Isolation", "Full stretch at bottom", "Don't swing"], videoUrl: yt("preacher curls") },
@@ -75,6 +76,7 @@ export const exerciseLibrary: Exercise[] = [
   { id: "lying-leg-curl", name: "Lying Leg Curls", muscleGroup: "hamstrings", equipment: "machine", formCues: ["Control eccentric", "Point toes", "Full range"], videoUrl: yt("lying leg curl") },
   { id: "leg-extension", name: "Leg Extensions", muscleGroup: "quads", equipment: "machine", formCues: ["Hold at top for 1s", "Control descent", "Full extension"], videoUrl: yt("leg extensions") },
   { id: "calf-raise", name: "Seated Calf Raises", muscleGroup: "calves", equipment: "machine", formCues: ["Full stretch at bottom", "Pause at top", "Slow negative"], videoUrl: yt("seated calf raises") },
+  { id: "standing-calf-raise", name: "Standing Calf Raises", muscleGroup: "calves", equipment: "machine", formCues: ["Full stretch at bottom", "Pause at top", "Don't bounce"], videoUrl: yt("standing calf raises") },
   { id: "leg-press", name: "Leg Press", muscleGroup: "quads", equipment: "machine", formCues: ["Feet high for glutes", "Full range", "Don't lock knees"], videoUrl: yt("leg press") },
   { id: "bulgarian-split", name: "Bulgarian Split Squat", muscleGroup: "quads", equipment: "dumbbell", formCues: ["Back foot on bench", "Torso upright", "Drive through front heel"], videoUrl: yt("bulgarian split squat") },
   { id: "hip-thrust", name: "Hip Thrust", muscleGroup: "glutes", equipment: "barbell", formCues: ["Squeeze glutes at top", "Chin tucked", "Pause at top"], videoUrl: yt("barbell hip thrust") },

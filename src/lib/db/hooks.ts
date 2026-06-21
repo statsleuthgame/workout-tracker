@@ -4,6 +4,8 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "./database";
 
 const PROGRAM_ID = "march-26-protocol";
+// Evergreen plan: all 7 day templates are stored under a single week slot.
+const TEMPLATE_WEEK = 1;
 
 export function useProgram() {
   return useLiveQuery(() => db.programs.get(PROGRAM_ID));
@@ -13,26 +15,20 @@ export function useExercise(id: string) {
   return useLiveQuery(() => db.exercises.get(id), [id]);
 }
 
-export function useTemplateForDay(weekNumber: number, dayOfWeek: number) {
+export function useTemplateForDay(dayOfWeek: number) {
   return useLiveQuery(
     () =>
       db.workoutTemplates
         .where("[programId+weekNumber+dayOfWeek]")
-        .equals([PROGRAM_ID, weekNumber, dayOfWeek])
+        .equals([PROGRAM_ID, TEMPLATE_WEEK, dayOfWeek])
         .first(),
-    [weekNumber, dayOfWeek]
+    [dayOfWeek]
   );
 }
 
-export function useTemplatesForWeek(weekNumber: number) {
-  return useLiveQuery(
-    () =>
-      db.workoutTemplates
-        .where("programId")
-        .equals(PROGRAM_ID)
-        .and((t) => t.weekNumber === weekNumber)
-        .sortBy("dayOfWeek"),
-    [weekNumber]
+export function useWeekTemplates() {
+  return useLiveQuery(() =>
+    db.workoutTemplates.where("programId").equals(PROGRAM_ID).sortBy("dayOfWeek")
   );
 }
 
@@ -54,21 +50,13 @@ export function useWorkoutLogs() {
   return useLiveQuery(() => db.workoutLogs.orderBy("date").reverse().toArray());
 }
 
-export function useCompletedWorkoutsForWeek(weekNumber: number) {
+// Set of completed workout dates (YYYY-MM-DD) within an inclusive date range.
+export function useCompletedDatesInRange(startDate: string, endDate: string) {
   return useLiveQuery(async () => {
-    const templates = await db.workoutTemplates
-      .where("programId")
-      .equals(PROGRAM_ID)
-      .and((t) => t.weekNumber === weekNumber)
-      .toArray();
-
-    const templateIds = templates.map((t) => t.id);
     const logs = await db.workoutLogs
-      .where("templateId")
-      .anyOf(templateIds)
-      .filter((log) => !!log.completedAt)
+      .where("date")
+      .between(startDate, endDate, true, true)
       .toArray();
-
-    return logs;
-  }, [weekNumber]);
+    return new Set(logs.filter((l) => l.completedAt).map((l) => l.date));
+  }, [startDate, endDate]);
 }

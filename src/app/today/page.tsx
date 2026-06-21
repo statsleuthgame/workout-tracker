@@ -4,14 +4,13 @@ import { useEffect, useState, useCallback, useMemo, useRef, Suspense } from "rea
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { ExerciseCard } from "@/components/workout/exercise-card";
-import { useTemplateForDay, useSetLogs, useProgram } from "@/lib/db/hooks";
+import { useTemplateForDay, useSetLogs } from "@/lib/db/hooks";
 import { db } from "@/lib/db/database";
 import {
-  getWeekNumber,
-  getDayOfWeek,
   getDateString,
   getDayName,
-  getDateForDayInWeek,
+  formatDate,
+  parseDateString,
 } from "@/lib/utils/dates";
 import { PageHeader } from "@/components/common/page-header";
 
@@ -35,23 +34,14 @@ function getProgressLabel(completed: number, total: number): string {
 
 function TodayContent() {
   const searchParams = useSearchParams();
-  const today = new Date();
 
-  // Use query params if provided (from week view), otherwise use today's date
-  const paramWeek = searchParams.get("week");
-  const paramDay = searchParams.get("day");
-
-  const weekNumber = paramWeek ? parseInt(paramWeek) : getWeekNumber(today);
-  const dayOfWeek = paramDay !== null ? parseInt(paramDay) : getDayOfWeek(today);
-
-  // Use the correct date for the selected day (not always today)
-  const targetDate = paramWeek
-    ? getDateForDayInWeek(weekNumber, dayOfWeek)
-    : today;
+  // Use the date query param if provided (from week view), otherwise today.
+  const paramDate = searchParams.get("date");
+  const targetDate = paramDate ? parseDateString(paramDate) : new Date();
   const dateStr = getDateString(targetDate);
+  const dayOfWeek = targetDate.getDay();
 
-  const program = useProgram();
-  const template = useTemplateForDay(weekNumber, dayOfWeek);
+  const template = useTemplateForDay(dayOfWeek);
   const [workoutLogId, setWorkoutLogId] = useState<string | null>(null);
   const [workoutNotes, setWorkoutNotes] = useState("");
   const [isFinished, setIsFinished] = useState(false);
@@ -112,7 +102,7 @@ function TodayContent() {
     }, 4700);
   }, [workoutLogId]);
 
-  if (!template || !program) {
+  if (!template) {
     return (
       <div className="flex h-[60vh] flex-col items-center justify-center gap-3">
         <div className="flex gap-1.5 text-muted-foreground">
@@ -131,7 +121,7 @@ function TodayContent() {
       <div className="space-y-4 px-4 pt-6">
         <PageHeader
           title="Rest Day"
-          subtitle={`${getDayName(dayOfWeek)} · Week ${weekNumber} of ${program.weeks}`}
+          subtitle={`${getDayName(dayOfWeek)} · ${formatDate(dateStr)}`}
         />
         <div className="flex flex-col items-center justify-center py-20 text-center">
           <div className="mb-5 text-6xl animate-milestone">&#9749;</div>
@@ -155,7 +145,7 @@ function TodayContent() {
       {/* Header */}
       <PageHeader
         title={template.dayLabel}
-        subtitle={`${getDayName(dayOfWeek)} · Week ${weekNumber} of ${program.weeks} · ${program.phase}`}
+        subtitle={`${getDayName(dayOfWeek)} · ${formatDate(dateStr)}`}
       />
 
       {/* Progress bar */}
