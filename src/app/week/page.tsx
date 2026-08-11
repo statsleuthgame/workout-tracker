@@ -173,6 +173,7 @@ export default function WeekPage() {
                       </span>
                       <span className="text-[10px] text-muted-foreground">
                         · {totalSets} sets
+                        {template.durationLabel ? ` · ${template.durationLabel}` : ""}
                       </span>
                     </div>
                     <p className="text-[11px] text-muted-foreground mt-1 truncate">

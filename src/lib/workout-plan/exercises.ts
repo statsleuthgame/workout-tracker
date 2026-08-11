@@ -73,6 +73,12 @@ export const exerciseLibrary: Exercise[] = [
   { id: "goblet-squat", name: "Goblet Squats", muscleGroup: "quads", equipment: "dumbbell", formCues: ["Hold dumbbell at chest", "Elbows inside knees", "Full depth"], videoUrl: yt("goblet squat") },
   { id: "hack-squat", name: "Hack Squat", muscleGroup: "quads", equipment: "machine", formCues: ["Full depth", "Feet shoulder width", "Control descent"], videoUrl: yt("hack squat machine") },
   { id: "rdl", name: "Romanian Deadlifts", muscleGroup: "hamstrings", equipment: "barbell", formCues: ["Hinge at hips", "Slight knee bend", "Feel hamstring stretch"], videoUrl: yt("romanian deadlift") },
+  { id: "single-leg-rdl", name: "Single-Leg DB RDL", muscleGroup: "hamstrings", equipment: "dumbbell", formCues: ["Soft knee, hinge at the hip", "Keep hips square to the floor", "Feel the hamstring stretch"], videoUrl: yt("single leg dumbbell romanian deadlift") },
+  { id: "cable-rdl", name: "Cable RDL", muscleGroup: "hamstrings", equipment: "cable", formCues: ["Hinge back into the cable", "Constant tension through the rep", "Squeeze glutes to stand tall"], videoUrl: yt("cable romanian deadlift") },
+  { id: "heels-elevated-squat", name: "Heels-Elevated Front Squat", muscleGroup: "quads", equipment: "dumbbell", formCues: ["Heels on a plate or wedge", "Torso tall, weight at chest", "Full depth — hack squat works too"], videoUrl: yt("heels elevated dumbbell front squat") },
+  { id: "leg-press-high-wide", name: "Leg Press (Feet High & Wide)", muscleGroup: "glutes", equipment: "machine", formCues: ["Feet high & wide on the platform", "Drive through the heels", "Deep range, don't lock knees"], videoUrl: yt("leg press feet high and wide glutes") },
+  { id: "hip-abductor", name: "Seated Hip Abduction", muscleGroup: "glutes", equipment: "machine", formCues: ["Lean slightly forward for glute med", "Pause at the widest point", "Control the return"], videoUrl: yt("seated hip abduction machine") },
+  { id: "hip-adductor", name: "Seated Hip Adduction", muscleGroup: "adductors", equipment: "machine", formCues: ["Full stretch at the start", "Squeeze legs together smoothly", "No bouncing"], videoUrl: yt("seated hip adduction machine") },
   { id: "lying-leg-curl", name: "Lying Leg Curls", muscleGroup: "hamstrings", equipment: "machine", formCues: ["Control eccentric", "Point toes", "Full range"], videoUrl: yt("lying leg curl") },
   { id: "leg-extension", name: "Leg Extensions", muscleGroup: "quads", equipment: "machine", formCues: ["Hold at top for 1s", "Control descent", "Full extension"], videoUrl: yt("leg extensions") },
   { id: "calf-raise", name: "Seated Calf Raises", muscleGroup: "calves", equipment: "machine", formCues: ["Full stretch at bottom", "Pause at top", "Slow negative"], videoUrl: yt("seated calf raises") },
@@ -92,6 +98,7 @@ export const exerciseLibrary: Exercise[] = [
   { id: "plank", name: "Plank", muscleGroup: "core", equipment: "bodyweight", formCues: ["Squeeze everything tight", "Flat back", "Breathe steadily"], videoUrl: yt("plank exercise") },
   { id: "ab-wheel", name: "Ab Wheel Rollout", muscleGroup: "core", equipment: "ab wheel", formCues: ["Brace core hard", "Don't arch back", "Controlled extension"], videoUrl: yt("ab wheel rollout") },
   { id: "pallof-press", name: "Pallof Press", muscleGroup: "core", equipment: "cable", formCues: ["Anti-rotation focus", "Press and hold", "Brace core"], videoUrl: yt("pallof press") },
+  { id: "standing-ab-crunch", name: "Standing Ab Crunch", muscleGroup: "core", equipment: "cable", formCues: ["Crunch down with the abs, not the arms", "Exhale hard at the bottom", "Slow, controlled return"], videoUrl: yt("standing cable crunch") },
 
   // ===== CARDIO =====
   { id: "incline-walk", name: "Incline Walk", muscleGroup: "cardio", equipment: "treadmill", formCues: ["Zone 2 heart rate", "No holding handrails", "Steady pace"], videoUrl: yt("incline treadmill walk") },

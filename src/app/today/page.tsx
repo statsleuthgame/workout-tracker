@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, useMemo, useRef, Suspense } from "rea
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { ExerciseCard } from "@/components/workout/exercise-card";
+import { WarmupCard } from "@/components/workout/warmup-card";
 import { useTemplateForDay, useSetLogs } from "@/lib/db/hooks";
 import { db } from "@/lib/db/database";
 import {
@@ -139,7 +140,8 @@ function TodayContent() {
           <div className="mb-5 text-6xl animate-milestone">&#9749;</div>
           <p className="text-2xl font-extrabold gradient-text">No workout today</p>
           <p className="mt-3 text-sm text-muted-foreground max-w-[240px]">
-            Rest, recover, and come back stronger tomorrow.
+            Full rest, light stretching, or a leisurely dog walk — let the
+            muscle repair and rebuild.
           </p>
         </div>
       </div>
@@ -157,7 +159,9 @@ function TodayContent() {
       {/* Header */}
       <PageHeader
         title={template.dayLabel}
-        subtitle={`${getDayName(dayOfWeek)} · ${formatDate(dateStr)}`}
+        subtitle={`${getDayName(dayOfWeek)} · ${formatDate(dateStr)}${
+          template.durationLabel ? ` · ${template.durationLabel}` : ""
+        }`}
       />
 
       {/* Progress bar */}
@@ -190,6 +194,11 @@ function TodayContent() {
           />
         </div>
       </div>
+
+      {/* Warm-up (informational, not tracked) */}
+      {template.warmup && (
+        <WarmupCard title={template.warmup.title} items={template.warmup.items} />
+      )}
 
       {/* Exercise Cards */}
       {workoutLogId && (

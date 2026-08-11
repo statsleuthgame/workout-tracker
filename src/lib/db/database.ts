@@ -29,6 +29,11 @@ export interface TemplateExercise {
   slotName: string;
 }
 
+export interface WarmupItem {
+  name: string;
+  detail: string; // reps/duration + purpose, e.g. "15 reps · opens shoulders & chest"
+}
+
 export interface WorkoutTemplate {
   id: string;
   programId: string;
@@ -36,6 +41,8 @@ export interface WorkoutTemplate {
   dayOfWeek: number; // 0=Sun ... 6=Sat
   dayLabel: string;
   dayTheme: string;
+  durationLabel?: string; // e.g. "~75 min" or "50–55 min"
+  warmup?: { title: string; items: WarmupItem[] };
   exercises: TemplateExercise[];
 }
 

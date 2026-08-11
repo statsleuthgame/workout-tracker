@@ -3,7 +3,7 @@ import { exerciseLibrary } from "../workout-plan/exercises";
 import { weeklyPlan } from "../workout-plan/templates";
 
 const PROGRAM_ID = "march-26-protocol";
-const SEED_VERSION = 6; // bump this to force re-seed of templates & exercises
+const SEED_VERSION = 7; // bump this to force re-seed of templates & exercises
 
 export async function seedDatabase() {
   const settings = await db.userSettings.get("default");
@@ -17,8 +17,8 @@ export async function seedDatabase() {
   // Seed or update program metadata
   await db.programs.put({
     id: PROGRAM_ID,
-    name: "Push Pull Legs",
-    phase: "6-Day Split · Lean & Strong",
+    name: "Upper / Lower Split",
+    phase: "6-Day Split · Sculpt & Strong",
     createdAt: new Date().toISOString(),
   });
 
@@ -33,6 +33,8 @@ export async function seedDatabase() {
     dayOfWeek: day.dayOfWeek,
     dayLabel: day.dayLabel,
     dayTheme: day.dayTheme,
+    durationLabel: day.durationLabel,
+    warmup: day.warmup,
     exercises: day.exercises,
   }));
   await db.workoutTemplates.bulkPut(templates);
