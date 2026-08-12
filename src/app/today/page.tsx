@@ -14,6 +14,18 @@ import {
   parseDateString,
 } from "@/lib/utils/dates";
 import { PageHeader } from "@/components/common/page-header";
+import { dayThemeFor } from "@/lib/workout-plan/templates";
+import { THEME_META_COLORS } from "@/lib/constants/theme-colors";
+
+// Point the app-wide day accent (CSS vars keyed off data-day-theme) and the
+// browser-chrome color at the given theme.
+function applyDayTheme(theme: string) {
+  document.documentElement.setAttribute("data-day-theme", theme);
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta && THEME_META_COLORS[theme]) {
+    meta.setAttribute("content", THEME_META_COLORS[theme]);
+  }
+}
 
 const CELEBRATION_PHRASES = [
   "Crushed it!",
@@ -52,6 +64,17 @@ function TodayContent() {
 
   // Debounced notes save
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  // While viewing a day, the whole app adopts that day's accent color.
+  // Leaving the page restores the real today's accent.
+  const viewedTheme = template?.dayTheme;
+  useEffect(() => {
+    if (!viewedTheme) return;
+    applyDayTheme(viewedTheme);
+    return () => {
+      applyDayTheme(dayThemeFor(new Date().getDay()));
+    };
+  }, [viewedTheme]);
 
   // Celebration phrase — deterministic from the date (pure render, SSR-stable).
   const celebrationPhrase = useMemo(() => {
@@ -189,7 +212,7 @@ function TodayContent() {
               background:
                 completedCount === totalCount && totalCount > 0
                   ? "var(--gradient-success)"
-                  : "linear-gradient(90deg, var(--info), var(--success))",
+                  : "linear-gradient(90deg, var(--primary), var(--success))",
             }}
           />
         </div>

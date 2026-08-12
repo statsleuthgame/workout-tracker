@@ -119,6 +119,11 @@ const saturdayMoves: Move[] = [
   { id: "calf-raise", label: "Seated Calf Raises", sets: 3, reps: "15", rest: 45, notes: "Slow negative, full stretch" },
 ];
 
+// Day-of-week -> dayTheme, for the app-wide accent color (data-day-theme).
+export function dayThemeFor(dayOfWeek: number): string {
+  return weeklyPlan.find((d) => d.dayOfWeek === dayOfWeek)?.dayTheme ?? "rest";
+}
+
 export const weeklyPlan: DayPlan[] = [
   { dayOfWeek: 0, dayLabel: "Rest Day", dayTheme: "rest", exercises: [] },
   { dayOfWeek: 1, dayLabel: "Upper Body · Push", dayTheme: "upper-push", durationLabel: "~75 min", warmup: upperWarmup, exercises: buildExercises(mondayMoves) },

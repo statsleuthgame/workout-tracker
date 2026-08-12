@@ -57,40 +57,47 @@
 }
 
 :root {
-  --background: oklch(0.97 0.005 155);
-  --foreground: oklch(0.15 0.02 155);
-  --card: oklch(0.995 0.002 155 / 80%);
-  --card-foreground: oklch(0.15 0.02 155);
-  --popover: oklch(0.995 0.002 155 / 95%);
-  --popover-foreground: oklch(0.15 0.02 155);
-  --primary: oklch(0.50 0.18 155);
+  /* Day-of-week accent. The whole accent system keys off these three vars,
+     which are overridden per day via [data-day-theme] on <html> (set by an
+     inline script before paint). Default = evergreen (Sunday / fallback). */
+  --day-hue: 155;
+  --day-hue2: 200; /* gradient partner hue */
+  --day-l: 0.50; /* light-mode primary lightness (warm hues need a boost) */
+
+  --background: oklch(0.97 0.005 var(--day-hue));
+  --foreground: oklch(0.15 0.02 var(--day-hue));
+  --card: oklch(0.995 0.002 var(--day-hue) / 80%);
+  --card-foreground: oklch(0.15 0.02 var(--day-hue));
+  --popover: oklch(0.995 0.002 var(--day-hue) / 95%);
+  --popover-foreground: oklch(0.15 0.02 var(--day-hue));
+  --primary: oklch(var(--day-l) 0.18 var(--day-hue));
   --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.94 0.025 155);
-  --secondary-foreground: oklch(0.25 0.06 155);
-  --muted: oklch(0.94 0.012 155);
-  --muted-foreground: oklch(0.42 0.02 155);
-  --accent: oklch(0.92 0.035 155);
-  --accent-foreground: oklch(0.20 0.06 155);
+  --secondary: oklch(0.94 0.025 var(--day-hue));
+  --secondary-foreground: oklch(0.25 0.06 var(--day-hue));
+  --muted: oklch(0.94 0.012 var(--day-hue));
+  --muted-foreground: oklch(0.42 0.02 var(--day-hue));
+  --accent: oklch(0.92 0.035 var(--day-hue));
+  --accent-foreground: oklch(0.20 0.06 var(--day-hue));
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.88 0.015 155);
-  --input: oklch(0.92 0.01 155);
-  --ring: oklch(0.50 0.18 155);
-  --chart-1: oklch(0.55 0.17 155);
+  --border: oklch(0.88 0.015 var(--day-hue));
+  --input: oklch(0.92 0.01 var(--day-hue));
+  --ring: oklch(var(--day-l) 0.18 var(--day-hue));
+  --chart-1: oklch(0.55 0.17 var(--day-hue));
   --chart-2: oklch(0.55 0.2 260);
   --chart-3: oklch(0.65 0.18 85);
   --chart-4: oklch(0.6 0.15 330);
   --chart-5: oklch(0.55 0.15 200);
   --radius: 0.75rem;
-  --sidebar: oklch(0.975 0.005 155);
-  --sidebar-foreground: oklch(0.15 0.02 155);
-  --sidebar-primary: oklch(0.50 0.18 155);
+  --sidebar: oklch(0.975 0.005 var(--day-hue));
+  --sidebar-foreground: oklch(0.15 0.02 var(--day-hue));
+  --sidebar-primary: oklch(var(--day-l) 0.18 var(--day-hue));
   --sidebar-primary-foreground: oklch(0.99 0 0);
-  --sidebar-accent: oklch(0.92 0.035 155);
-  --sidebar-accent-foreground: oklch(0.25 0.06 155);
-  --sidebar-border: oklch(0.88 0.015 155);
-  --sidebar-ring: oklch(0.50 0.18 155);
+  --sidebar-accent: oklch(0.92 0.035 var(--day-hue));
+  --sidebar-accent-foreground: oklch(0.25 0.06 var(--day-hue));
+  --sidebar-border: oklch(0.88 0.015 var(--day-hue));
+  --sidebar-ring: oklch(var(--day-l) 0.18 var(--day-hue));
 
-  /* Semantic tokens */
+  /* Semantic tokens — success stays green on every day (completion cue) */
   --success: oklch(0.55 0.19 155);
   --success-foreground: oklch(0.99 0 0);
   --success-muted: oklch(0.93 0.07 155);
@@ -102,51 +109,61 @@
   --warning-muted: oklch(0.93 0.06 85);
 
   /* Gradient tokens */
-  --gradient-primary: linear-gradient(135deg, oklch(0.50 0.18 155), oklch(0.52 0.20 200));
+  --gradient-primary: linear-gradient(135deg, oklch(var(--day-l) 0.18 var(--day-hue)), oklch(calc(var(--day-l) + 0.02) 0.20 var(--day-hue2)));
   --gradient-success: linear-gradient(135deg, oklch(0.48 0.18 150), oklch(0.55 0.20 170));
   --gradient-info: linear-gradient(135deg, oklch(0.48 0.22 250), oklch(0.52 0.18 280));
-  --gradient-warm: linear-gradient(135deg, oklch(0.52 0.18 250), oklch(0.50 0.18 155));
-  --gradient-page: linear-gradient(180deg, oklch(0.95 0.03 155) 0%, oklch(0.97 0.01 200) 50%, oklch(0.97 0.005 155) 100%);
+  --gradient-warm: linear-gradient(135deg, oklch(0.52 0.18 250), oklch(var(--day-l) 0.18 var(--day-hue)));
+  --gradient-page: linear-gradient(180deg, oklch(0.95 0.03 var(--day-hue)) 0%, oklch(0.97 0.01 var(--day-hue2)) 50%, oklch(0.97 0.005 var(--day-hue)) 100%);
   --glass-bg: oklch(1 0 0 / 50%);
   --glass-border: oklch(1 0 0 / 70%);
   --glass-shadow: 0 1px 2px oklch(0 0 0 / 5%), 0 4px 16px oklch(0 0 0 / 8%);
   --glass-shadow-lg: 0 2px 8px oklch(0 0 0 / 8%), 0 12px 32px oklch(0 0 0 / 12%);
 }
 
+/* Per-day accent hues (Tailwind-anchor hues in oklch). Warm hues get a
+   lightness boost in light mode so buttons stay vivid instead of muddy. */
+:root[data-day-theme="upper-push"]         { --day-hue: 260; --day-hue2: 235; }               /* Monday · blue */
+:root[data-day-theme="lower-ham-glute"]    { --day-hue: 48;  --day-hue2: 65;  --day-l: 0.55; } /* Tuesday · orange */
+:root[data-day-theme="upper-pull"]         { --day-hue: 293; --day-hue2: 268; }               /* Wednesday · violet */
+:root[data-day-theme="lower-quad"]         { --day-hue: 70;  --day-hue2: 50;  --day-l: 0.58; } /* Thursday · amber */
+:root[data-day-theme="upper-sculpt"]       { --day-hue: 237; --day-hue2: 210; --day-l: 0.52; } /* Friday · sky blue */
+:root[data-day-theme="lower-glute-volume"] { --day-hue: 16;  --day-hue2: 350; --day-l: 0.52; } /* Saturday · rose */
+/* rest (Sunday) keeps the evergreen defaults */
+
 .dark {
-  --background: oklch(0.11 0.015 155);
-  --foreground: oklch(0.94 0.008 155);
-  --card: oklch(0.16 0.018 155 / 70%);
-  --card-foreground: oklch(0.94 0.008 155);
-  --popover: oklch(0.16 0.018 155 / 90%);
-  --popover-foreground: oklch(0.94 0.008 155);
-  --primary: oklch(0.68 0.20 155);
-  --primary-foreground: oklch(0.10 0.02 155);
-  --secondary: oklch(0.20 0.02 155);
-  --secondary-foreground: oklch(0.94 0.008 155);
-  --muted: oklch(0.20 0.018 155);
-  --muted-foreground: oklch(0.60 0.015 155);
-  --accent: oklch(0.20 0.025 155);
-  --accent-foreground: oklch(0.94 0.008 155);
+  --background: oklch(0.11 0.015 var(--day-hue));
+  --foreground: oklch(0.94 0.008 var(--day-hue));
+  --card: oklch(0.16 0.018 var(--day-hue) / 70%);
+  --card-foreground: oklch(0.94 0.008 var(--day-hue));
+  --popover: oklch(0.16 0.018 var(--day-hue) / 90%);
+  --popover-foreground: oklch(0.94 0.008 var(--day-hue));
+  --primary: oklch(0.68 0.20 var(--day-hue));
+  --primary-foreground: oklch(0.10 0.02 var(--day-hue));
+  --secondary: oklch(0.20 0.02 var(--day-hue));
+  --secondary-foreground: oklch(0.94 0.008 var(--day-hue));
+  --muted: oklch(0.20 0.018 var(--day-hue));
+  --muted-foreground: oklch(0.60 0.015 var(--day-hue));
+  --accent: oklch(0.20 0.025 var(--day-hue));
+  --accent-foreground: oklch(0.94 0.008 var(--day-hue));
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 8%);
   --input: oklch(1 0 0 / 10%);
-  --ring: oklch(0.68 0.20 155);
-  --chart-1: oklch(0.65 0.19 155);
+  --ring: oklch(0.68 0.20 var(--day-hue));
+  --chart-1: oklch(0.65 0.19 var(--day-hue));
   --chart-2: oklch(0.65 0.2 260);
   --chart-3: oklch(0.72 0.18 85);
   --chart-4: oklch(0.65 0.15 330);
   --chart-5: oklch(0.6 0.15 200);
-  --sidebar: oklch(0.16 0.018 155);
-  --sidebar-foreground: oklch(0.94 0.008 155);
-  --sidebar-primary: oklch(0.68 0.20 155);
-  --sidebar-primary-foreground: oklch(0.10 0.02 155);
-  --sidebar-accent: oklch(0.20 0.025 155);
-  --sidebar-accent-foreground: oklch(0.94 0.008 155);
+  --sidebar: oklch(0.16 0.018 var(--day-hue));
+  --sidebar-foreground: oklch(0.94 0.008 var(--day-hue));
+  --sidebar-primary: oklch(0.68 0.20 var(--day-hue));
+  --sidebar-primary-foreground: oklch(0.10 0.02 var(--day-hue));
+  --sidebar-accent: oklch(0.20 0.025 var(--day-hue));
+  --sidebar-accent-foreground: oklch(0.94 0.008 var(--day-hue));
   --sidebar-border: oklch(1 0 0 / 8%);
-  --sidebar-ring: oklch(0.68 0.20 155);
+  --sidebar-ring: oklch(0.68 0.20 var(--day-hue));
 
-  /* Semantic tokens — dark */
+  /* Semantic tokens — dark (success stays green on every day) */
   --success: oklch(0.65 0.20 155);
   --success-foreground: oklch(0.10 0.02 155);
   --success-muted: oklch(0.20 0.07 155);
@@ -158,11 +175,11 @@
   --warning-muted: oklch(0.20 0.07 85);
 
   /* Gradient tokens — dark */
-  --gradient-primary: linear-gradient(135deg, oklch(0.55 0.20 155), oklch(0.58 0.22 200));
+  --gradient-primary: linear-gradient(135deg, oklch(0.55 0.20 var(--day-hue)), oklch(0.58 0.22 var(--day-hue2)));
   --gradient-success: linear-gradient(135deg, oklch(0.50 0.18 150), oklch(0.60 0.20 170));
   --gradient-info: linear-gradient(135deg, oklch(0.50 0.22 250), oklch(0.55 0.18 280));
-  --gradient-warm: linear-gradient(135deg, oklch(0.55 0.18 250), oklch(0.52 0.18 155));
-  --gradient-page: linear-gradient(180deg, oklch(0.14 0.025 155) 0%, oklch(0.12 0.02 200) 50%, oklch(0.11 0.015 155) 100%);
+  --gradient-warm: linear-gradient(135deg, oklch(0.55 0.18 250), oklch(0.52 0.18 var(--day-hue)));
+  --gradient-page: linear-gradient(180deg, oklch(0.14 0.025 var(--day-hue)) 0%, oklch(0.12 0.02 var(--day-hue2)) 50%, oklch(0.11 0.015 var(--day-hue)) 100%);
   --glass-bg: oklch(1 0 0 / 6%);
   --glass-border: oklch(1 0 0 / 12%);
   --glass-shadow: 0 1px 2px oklch(0 0 0 / 20%), 0 4px 16px oklch(0 0 0 / 30%);
@@ -212,19 +229,19 @@
 .btn-gradient-primary {
   background: var(--gradient-primary);
   color: var(--primary-foreground);
-  box-shadow: 0 2px 8px oklch(0.50 0.18 155 / 30%);
+  box-shadow: 0 2px 8px oklch(var(--day-l) 0.18 var(--day-hue) / 30%);
   transition: all 0.2s ease;
 }
 .btn-gradient-primary:hover {
-  box-shadow: 0 4px 16px oklch(0.50 0.18 155 / 40%);
+  box-shadow: 0 4px 16px oklch(var(--day-l) 0.18 var(--day-hue) / 40%);
   transform: translateY(-1px);
 }
 .btn-gradient-primary:active {
   transform: translateY(0);
-  box-shadow: 0 1px 4px oklch(0.50 0.18 155 / 20%);
+  box-shadow: 0 1px 4px oklch(var(--day-l) 0.18 var(--day-hue) / 20%);
 }
 .dark .btn-gradient-primary {
-  box-shadow: 0 2px 8px oklch(0.55 0.20 155 / 25%);
+  box-shadow: 0 2px 8px oklch(0.55 0.20 var(--day-hue) / 25%);
 }
 
 .btn-gradient-success {
@@ -272,7 +289,7 @@
   height: 4px;
   border-radius: 50%;
   background: var(--gradient-primary);
-  box-shadow: 0 0 6px oklch(0.50 0.18 155 / 50%);
+  box-shadow: 0 0 6px oklch(var(--day-l) 0.18 var(--day-hue) / 50%);
 }
 
 /* Accent stripe for cards */
@@ -308,8 +325,8 @@
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 0 0 oklch(0.50 0.18 155 / 0%); }
-  50% { box-shadow: 0 0 16px 4px oklch(0.50 0.18 155 / 15%); }
+  0%, 100% { box-shadow: 0 0 0 0 oklch(var(--day-l) 0.18 var(--day-hue) / 0%); }
+  50% { box-shadow: 0 0 16px 4px oklch(var(--day-l) 0.18 var(--day-hue) / 15%); }
 }
 
 @keyframes confetti-burst {
@@ -320,8 +337,8 @@
 
 /* Breathing glow for active elements */
 @keyframes breathing-glow {
-  0%, 100% { box-shadow: 0 0 8px 0 oklch(0.50 0.18 155 / 15%); }
-  50% { box-shadow: 0 0 20px 4px oklch(0.50 0.18 155 / 30%); }
+  0%, 100% { box-shadow: 0 0 8px 0 oklch(var(--day-l) 0.18 var(--day-hue) / 15%); }
+  50% { box-shadow: 0 0 20px 4px oklch(var(--day-l) 0.18 var(--day-hue) / 30%); }
 }
 
 /* Floating animation for background blobs */
@@ -365,8 +382,8 @@
 
 /* Input focus flash */
 @keyframes input-flash {
-  0% { box-shadow: 0 0 0 3px oklch(0.50 0.18 155 / 40%); }
-  100% { box-shadow: 0 0 0 0 oklch(0.50 0.18 155 / 0%); }
+  0% { box-shadow: 0 0 0 3px oklch(var(--day-l) 0.18 var(--day-hue) / 40%); }
+  100% { box-shadow: 0 0 0 0 oklch(var(--day-l) 0.18 var(--day-hue) / 0%); }
 }
 
 /* Spin-in celebration image */
@@ -455,12 +472,12 @@
   transition: all 0.3s ease;
 }
 .input-glow:focus {
-  border-color: oklch(0.50 0.18 155 / 50%);
-  box-shadow: 0 0 0 3px oklch(0.50 0.18 155 / 15%);
+  border-color: oklch(var(--day-l) 0.18 var(--day-hue) / 50%);
+  box-shadow: 0 0 0 3px oklch(var(--day-l) 0.18 var(--day-hue) / 15%);
 }
 .dark .input-glow:focus {
-  border-color: oklch(0.68 0.20 155 / 50%);
-  box-shadow: 0 0 0 3px oklch(0.68 0.20 155 / 15%);
+  border-color: oklch(0.68 0.20 var(--day-hue) / 50%);
+  box-shadow: 0 0 0 3px oklch(0.68 0.20 var(--day-hue) / 15%);
 }
 
 /* Gradient border effect for stat cards */
@@ -475,7 +492,7 @@
   right: 0;
   height: 2px;
   border-radius: 9999px 9999px 0 0;
-  background: linear-gradient(90deg, oklch(0.50 0.18 155), oklch(0.52 0.20 200), oklch(0.55 0.19 155));
+  background: linear-gradient(90deg, oklch(var(--day-l) 0.18 var(--day-hue)), oklch(calc(var(--day-l) + 0.02) 0.20 var(--day-hue2)), oklch(calc(var(--day-l) + 0.05) 0.19 var(--day-hue)));
   background-size: 200% 100%;
   animation: border-shimmer 4s ease-in-out infinite;
 }
@@ -494,17 +511,17 @@
   height: 3px;
   border-radius: 9999px;
   background: var(--gradient-primary);
-  box-shadow: 0 0 8px oklch(0.50 0.18 155 / 40%);
+  box-shadow: 0 0 8px oklch(var(--day-l) 0.18 var(--day-hue) / 40%);
 }
 
 /* Progress bar glow */
 .progress-glow {
-  box-shadow: 0 0 8px oklch(0.50 0.18 155 / 20%), 0 0 20px oklch(0.52 0.2 260 / 10%);
+  box-shadow: 0 0 8px oklch(var(--day-l) 0.18 var(--day-hue) / 20%), 0 0 20px oklch(calc(var(--day-l) + 0.02) 0.2 var(--day-hue2) / 10%);
 }
 
 /* Celebration card */
 .celebration-card {
-  background: linear-gradient(135deg, var(--glass-bg), oklch(0.50 0.18 155 / 8%));
+  background: linear-gradient(135deg, var(--glass-bg), oklch(var(--day-l) 0.18 var(--day-hue) / 8%));
   position: relative;
   overflow: hidden;
 }
@@ -515,7 +532,7 @@
   left: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(circle, oklch(0.50 0.18 155 / 6%) 0%, transparent 60%);
+  background: radial-gradient(circle, oklch(var(--day-l) 0.18 var(--day-hue) / 6%) 0%, transparent 60%);
   animation: float-slow 15s ease-in-out infinite;
   pointer-events: none;
 }

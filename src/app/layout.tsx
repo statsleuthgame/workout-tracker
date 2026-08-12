@@ -3,6 +3,15 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { BottomNav } from "@/components/layout/bottom-nav";
 import { DbProvider } from "@/components/layout/db-provider";
+import { weeklyPlan } from "@/lib/workout-plan/templates";
+import { THEME_META_COLORS } from "@/lib/constants/theme-colors";
+
+// Day-of-week (0=Sun..6=Sat) -> dayTheme, serialized into the inline script
+// below so the day accent applies before first paint (no green flash).
+const THEMES_BY_DAY = JSON.stringify(
+  Array.from({ length: 7 }, (_, i) => weeklyPlan.find((d) => d.dayOfWeek === i)?.dayTheme ?? "rest")
+);
+const META_COLORS = JSON.stringify(THEME_META_COLORS);
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,6 +47,11 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem('theme');if(t==='dark'||(!t&&matchMedia('(prefers-color-scheme:dark)').matches))document.documentElement.classList.add('dark')}catch(e){}})()`,
+          }}
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var themes=${THEMES_BY_DAY};var colors=${META_COLORS};var t=themes[new Date().getDay()];document.documentElement.setAttribute('data-day-theme',t);var apply=function(){var m=document.querySelector('meta[name="theme-color"]');if(m&&colors[t])m.setAttribute('content',colors[t])};apply();window.addEventListener('load',apply)}catch(e){}})()`,
           }}
         />
         <script

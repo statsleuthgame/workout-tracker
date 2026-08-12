@@ -204,7 +204,7 @@ export function ExerciseCard({
             target="_blank"
             rel="noopener noreferrer"
             aria-label={`Watch ${exercise.name} form video`}
-            className="shrink-0 rounded-lg p-1.5 text-info transition-colors hover:bg-info-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="shrink-0 rounded-lg p-1.5 text-primary transition-colors hover:bg-accent/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <PlayCircle className="h-5 w-5" aria-hidden="true" />
           </a>
@@ -216,8 +216,8 @@ export function ExerciseCard({
           <FormCueTip cues={exercise.formCues} />
 
           {!isCardio && suggestion && (
-            <div className="rounded-xl bg-info-muted/60 px-3 py-2.5 border border-info/10">
-              <p className="text-xs font-semibold text-info">
+            <div className="rounded-xl bg-accent/60 px-3 py-2.5 border border-primary/10">
+              <p className="text-xs font-semibold text-primary">
                 {suggestion.label}
               </p>
             </div>

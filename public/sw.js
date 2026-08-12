@@ -37,6 +37,12 @@ self.addEventListener("fetch", (event) => {
   // Skip non-GET requests
   if (request.method !== "GET") return;
 
+  // Dev server: never intercept. Dev chunk URLs aren't content-hashed, so
+  // cache-first would keep serving stale code after every edit.
+  if (self.location.hostname === "localhost" || self.location.hostname === "127.0.0.1") {
+    return;
+  }
+
   // Skip Chrome extension requests and Next.js HMR/webpack
   const url = new URL(request.url);
   if (

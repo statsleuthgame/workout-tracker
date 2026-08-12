@@ -9,6 +9,18 @@ export const THEME_COLORS: Record<string, { bg: string; text: string; dot: strin
   "rest":               { bg: "bg-slate-500/10", text: "text-slate-500 dark:text-slate-400", dot: "bg-slate-400", border: "border-l-slate-400" },
 };
 
+// Browser-chrome color (PWA status bar / <meta name="theme-color">) per day theme.
+export const THEME_META_COLORS: Record<string, string> = {
+  "upper-push": "#2563eb",
+  "upper-pull": "#7c3aed",
+  "upper-sculpt": "#0284c7",
+  "lower-ham-glute": "#ea580c",
+  "lower-quad": "#d97706",
+  "lower-glute-volume": "#e11d48",
+  "recovery": "#166534",
+  "rest": "#166534",
+};
+
 const DEFAULT_THEME = { bg: "bg-muted/60", text: "text-muted-foreground", dot: "bg-muted-foreground", border: "border-l-muted-foreground" };
 
 export function getThemeColor(dayTheme: string) {
