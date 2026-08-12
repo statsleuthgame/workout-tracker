@@ -1,8 +1,8 @@
-// Chart colors for Recharts (which requires hex/rgb, not CSS vars)
-// Keep in sync with semantic tokens in globals.css
+// Chart colors for Recharts. Colors land on SVG stroke/fill attributes,
+// which accept CSS var() — so chart accents follow the day theme.
 export const CHART_COLORS = {
-  success: "#16a34a",
-  info: "#4f46e5",
+  success: "var(--primary)",
+  info: "var(--primary)",
   warning: "#d97706",
   grid: "#d1d5db",
   gridDark: "#374151",

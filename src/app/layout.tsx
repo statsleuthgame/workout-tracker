@@ -65,7 +65,7 @@ export default function RootLayout({
       >
         <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none" aria-hidden="true">
           <div className="absolute -top-1/3 -right-1/4 h-[600px] w-[600px] rounded-full bg-primary/10 blur-[120px] blob-float" />
-          <div className="absolute top-1/2 -left-1/3 h-[500px] w-[500px] rounded-full bg-info/8 blur-[100px] blob-float-reverse" />
+          <div className="absolute top-1/2 -left-1/3 h-[500px] w-[500px] rounded-full bg-primary/8 blur-[100px] blob-float-reverse" />
           <div className="absolute -bottom-1/4 right-1/3 h-[400px] w-[400px] rounded-full bg-success/5 blur-[100px] blob-float" />
         </div>
         <DbProvider>

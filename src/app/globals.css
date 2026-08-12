@@ -97,10 +97,11 @@
   --sidebar-border: oklch(0.88 0.015 var(--day-hue));
   --sidebar-ring: oklch(var(--day-l) 0.18 var(--day-hue));
 
-  /* Semantic tokens — success stays green on every day (completion cue) */
-  --success: oklch(0.55 0.19 155);
+  /* Semantic tokens — success follows the day accent too, so completed
+     states match the rest of the app */
+  --success: oklch(calc(var(--day-l) + 0.05) 0.19 var(--day-hue));
   --success-foreground: oklch(0.99 0 0);
-  --success-muted: oklch(0.93 0.07 155);
+  --success-muted: oklch(0.93 0.07 var(--day-hue));
   --info: oklch(0.52 0.2 260);
   --info-foreground: oklch(0.99 0 0);
   --info-muted: oklch(0.93 0.05 260);
@@ -110,7 +111,7 @@
 
   /* Gradient tokens */
   --gradient-primary: linear-gradient(135deg, oklch(var(--day-l) 0.18 var(--day-hue)), oklch(calc(var(--day-l) + 0.02) 0.20 var(--day-hue2)));
-  --gradient-success: linear-gradient(135deg, oklch(0.48 0.18 150), oklch(0.55 0.20 170));
+  --gradient-success: linear-gradient(135deg, oklch(calc(var(--day-l) - 0.02) 0.18 var(--day-hue)), oklch(calc(var(--day-l) + 0.05) 0.20 var(--day-hue2)));
   --gradient-info: linear-gradient(135deg, oklch(0.48 0.22 250), oklch(0.52 0.18 280));
   --gradient-warm: linear-gradient(135deg, oklch(0.52 0.18 250), oklch(var(--day-l) 0.18 var(--day-hue)));
   --gradient-page: linear-gradient(180deg, oklch(0.95 0.03 var(--day-hue)) 0%, oklch(0.97 0.01 var(--day-hue2)) 50%, oklch(0.97 0.005 var(--day-hue)) 100%);
@@ -163,10 +164,10 @@
   --sidebar-border: oklch(1 0 0 / 8%);
   --sidebar-ring: oklch(0.68 0.20 var(--day-hue));
 
-  /* Semantic tokens — dark (success stays green on every day) */
-  --success: oklch(0.65 0.20 155);
-  --success-foreground: oklch(0.10 0.02 155);
-  --success-muted: oklch(0.20 0.07 155);
+  /* Semantic tokens — dark (success follows the day accent) */
+  --success: oklch(0.65 0.20 var(--day-hue));
+  --success-foreground: oklch(0.10 0.02 var(--day-hue));
+  --success-muted: oklch(0.20 0.07 var(--day-hue));
   --info: oklch(0.65 0.20 260);
   --info-foreground: oklch(0.10 0 0);
   --info-muted: oklch(0.20 0.07 260);
@@ -176,7 +177,7 @@
 
   /* Gradient tokens — dark */
   --gradient-primary: linear-gradient(135deg, oklch(0.55 0.20 var(--day-hue)), oklch(0.58 0.22 var(--day-hue2)));
-  --gradient-success: linear-gradient(135deg, oklch(0.50 0.18 150), oklch(0.60 0.20 170));
+  --gradient-success: linear-gradient(135deg, oklch(0.50 0.18 var(--day-hue)), oklch(0.60 0.20 var(--day-hue2)));
   --gradient-info: linear-gradient(135deg, oklch(0.50 0.22 250), oklch(0.55 0.18 280));
   --gradient-warm: linear-gradient(135deg, oklch(0.55 0.18 250), oklch(0.52 0.18 var(--day-hue)));
   --gradient-page: linear-gradient(180deg, oklch(0.14 0.025 var(--day-hue)) 0%, oklch(0.12 0.02 var(--day-hue2)) 50%, oklch(0.11 0.015 var(--day-hue)) 100%);
@@ -247,16 +248,16 @@
 .btn-gradient-success {
   background: var(--gradient-success);
   color: var(--success-foreground);
-  box-shadow: 0 2px 8px oklch(0.50 0.18 150 / 30%);
+  box-shadow: 0 2px 8px oklch(var(--day-l) 0.18 var(--day-hue) / 30%);
   transition: all 0.2s ease;
 }
 .btn-gradient-success:hover {
-  box-shadow: 0 4px 16px oklch(0.50 0.18 150 / 40%);
+  box-shadow: 0 4px 16px oklch(var(--day-l) 0.18 var(--day-hue) / 40%);
   transform: translateY(-1px);
 }
 .btn-gradient-success:active {
   transform: translateY(0);
-  box-shadow: 0 1px 4px oklch(0.50 0.18 150 / 20%);
+  box-shadow: 0 1px 4px oklch(var(--day-l) 0.18 var(--day-hue) / 20%);
 }
 
 /* Shimmer effect for progress bars */
