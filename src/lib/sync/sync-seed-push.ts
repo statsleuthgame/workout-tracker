@@ -37,6 +37,60 @@ function mapBodyMetric(m: Record<string, unknown>) {
   };
 }
 
+export interface ForceSyncResult {
+  workouts: number;
+  sets: number;
+  metrics: number;
+  errors: string[];
+}
+
+/**
+ * Force-push ALL local IndexedDB data to Supabase, bypassing the
+ * cloud-already-has-data guard in pushAllExistingData(). Used to migrate a
+ * device whose history never synced (e.g. while the backend was paused).
+ * Idempotent — every row is upserted by id, so re-running is safe.
+ */
+export async function forcePushAllData(): Promise<ForceSyncResult> {
+  const result: ForceSyncResult = { workouts: 0, sets: 0, metrics: 0, errors: [] };
+  const supabase = getSupabase();
+  if (!supabase) {
+    result.errors.push("Supabase not configured");
+    return result;
+  }
+
+  const [workoutLogs, setLogs, bodyMetrics] = await Promise.all([
+    db.workoutLogs.toArray(),
+    db.setLogs.toArray(),
+    db.bodyMetrics.toArray(),
+  ]);
+
+  const mappedWL = workoutLogs.map((l) => mapWorkoutLog(l as unknown as Record<string, unknown>));
+  const mappedSL = setLogs.map((l) => mapSetLog(l as unknown as Record<string, unknown>));
+  const mappedBM = bodyMetrics.map((m) => mapBodyMetric(m as unknown as Record<string, unknown>));
+
+  // workout_logs first (set_logs reference them), then sets in batches, then metrics.
+  for (let i = 0; i < mappedWL.length; i += 500) {
+    const batch = mappedWL.slice(i, i + 500);
+    const { error } = await supabase.from("workout_logs").upsert(batch, { onConflict: "id" });
+    if (error) result.errors.push(`workout_logs: ${error.message}`);
+    else result.workouts += batch.length;
+  }
+  for (let i = 0; i < mappedSL.length; i += 500) {
+    const batch = mappedSL.slice(i, i + 500);
+    const { error } = await supabase.from("set_logs").upsert(batch, { onConflict: "id" });
+    if (error) result.errors.push(`set_logs: ${error.message}`);
+    else result.sets += batch.length;
+  }
+  for (let i = 0; i < mappedBM.length; i += 500) {
+    const batch = mappedBM.slice(i, i + 500);
+    const { error } = await supabase.from("body_metrics").upsert(batch, { onConflict: "id" });
+    if (error) result.errors.push(`body_metrics: ${error.message}`);
+    else result.metrics += batch.length;
+  }
+
+  return result;
+}
+
 let hasRun = false;
 
 /**

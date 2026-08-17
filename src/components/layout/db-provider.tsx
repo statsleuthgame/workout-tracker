@@ -3,9 +3,11 @@
 import { useEffect, useState } from "react";
 import { seedDatabase } from "@/lib/db/seed";
 import { initSync } from "@/lib/sync/sync-init";
+import { forcePushAllData } from "@/lib/sync/sync-seed-push";
 
 export function DbProvider({ children }: { children: React.ReactNode }) {
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+  const [forceSyncMsg, setForceSyncMsg] = useState<string | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -19,6 +21,24 @@ export function DbProvider({ children }: { children: React.ReactNode }) {
         } catch (err) {
           console.warn("[sync] init failed", err);
         }
+
+        // One-time migration trigger: /today?forcesync=1 pushes ALL local data
+        // to the cloud (for a device whose history never synced).
+        if (
+          typeof window !== "undefined" &&
+          new URLSearchParams(window.location.search).get("forcesync") === "1"
+        ) {
+          try {
+            const r = await forcePushAllData();
+            const msg = r.errors.length
+              ? `Synced ${r.workouts} workouts, ${r.sets} sets, ${r.metrics} weigh-ins.\n\nErrors: ${r.errors.join("; ")}`
+              : `✅ Synced ${r.workouts} workouts, ${r.sets} sets, ${r.metrics} weigh-ins to the cloud.\n\nYou can close this and tell Cody it's done.`;
+            if (mounted) setForceSyncMsg(msg);
+          } catch (err) {
+            if (mounted) setForceSyncMsg(`Force sync failed: ${String(err)}`);
+          }
+        }
+
         if (mounted) setStatus("ready");
       } catch (err) {
         console.error("[db] initialization failed", err);
@@ -60,5 +80,24 @@ export function DbProvider({ children }: { children: React.ReactNode }) {
     );
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      {forceSyncMsg && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-6 backdrop-blur-sm">
+          <div className="max-w-sm rounded-2xl bg-card p-6 text-center shadow-2xl border border-border">
+            <p className="whitespace-pre-line text-sm font-medium text-foreground">
+              {forceSyncMsg}
+            </p>
+            <button
+              onClick={() => setForceSyncMsg(null)}
+              className="mt-5 rounded-2xl btn-gradient-primary px-6 py-3 text-sm font-bold active:scale-95"
+            >
+              Done
+            </button>
+          </div>
+        </div>
+      )}
+      {children}
+    </>
+  );
 }
