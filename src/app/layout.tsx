@@ -3,7 +3,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { BottomNav } from "@/components/layout/bottom-nav";
 import { DbProvider } from "@/components/layout/db-provider";
-import { ForceSyncButton } from "@/components/common/force-sync-button";
 import { weeklyPlan } from "@/lib/workout-plan/templates";
 import { THEME_META_COLORS } from "@/lib/constants/theme-colors";
 
@@ -70,7 +69,6 @@ export default function RootLayout({
           <div className="absolute -bottom-1/4 right-1/3 h-[400px] w-[400px] rounded-full bg-success/5 blur-[100px] blob-float" />
         </div>
         <DbProvider>
-          <ForceSyncButton />
           <main className="mx-auto min-h-screen max-w-md pb-28">
             {children}
           </main>
